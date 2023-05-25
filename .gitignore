@@ -56,10 +56,6 @@ target/
 # Mac OS X
 .DS_Store
 
-# Gradle Wrapper
-gradlew
-gradlew.bat
-gradle/wrapper/gradle-wrapper.properties
 
 # Maven Wrapper
 mvnw
