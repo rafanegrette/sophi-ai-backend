@@ -5,7 +5,7 @@ phases:
     commands:
       - echo Installing Docker...
       - sudo yum install -y docker
-      - sudo service docker start
+      - sudo systemctl start docker
       - sudo usermod -a -G docker ec2-user
       - echo Checking for GraalVM CE 22.3.0...
       - |
