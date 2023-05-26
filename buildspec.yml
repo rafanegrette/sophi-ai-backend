@@ -4,14 +4,18 @@ phases:
   install:
     commands:
       - echo Installing Docker...
-      - amazon-linux-extras install docker -y
-      - service docker start
-      - usermod -a -G docker ec2-user
-      - echo Installing Java 17...
-      - wget https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17_linux-x64_bin.tar.gz
-      - tar zxvf openjdk-17_linux-x64_bin.tar.gz
-      - sudo mv jdk-17 /usr/local/
-      - echo 'export PATH=/usr/local/jdk-17/bin:$PATH' >> ~/.bashrc
+      - sudo yum install -y docker
+      - sudo service docker start
+      - sudo usermod -a -G docker ec2-user
+      - echo Checking for GraalVM CE 22.3.0...
+      - |
+        if [ ! -d "/usr/local/graalvm-ce-22.3.0" ]; then
+          echo GraalVM CE 22.3.0 not found, installing...
+          wget https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.3.0/graalvm-ce-java17-linux-amd64-22.3.0.tar.gz
+          tar zxvf graalvm-ce-java17-linux-amd64-22.3.0.tar.gz
+          sudo mv graalvm-ce-java17-22.3.0 /usr/local/graalvm-ce-22.3.0
+        fi
+      - echo 'export PATH=/usr/local/graalvm-ce-22.3.0/bin:$PATH' >> ~/.bashrc
       - source ~/.bashrc
       
   pre_build:
@@ -36,7 +40,7 @@ phases:
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
 
 artifacts:
-  files:
-    - '**/*'
-  name: $(date +%Y-%m-%d)
-  discard-paths: yes
+  files: imagedefinitions.json
+cache:
+  paths:
+   - '/usr/local/graalvm-ce-22.3.0/**/*'
