@@ -54,7 +54,7 @@ bootBuildImage {
 	builder = 'paketobuildpacks/builder:tiny'
 	environment = [
 		'BP_NATIVE_IMAGE': 'true',
-	    'BP_NATIVE_IMAGE_BUILD_ARGUMENTS': '--initialize-at-build-time=com.ctc.wstx.api.ReaderConfig,com.ctc.wstx.api.CommonConfig,com.ctc.wstx.util.DefaultXmlSymbolTable,com.ctc.wstx.stax.WstxInputFactory'
+	    'BP_NATIVE_IMAGE_BUILD_ARGUMENTS': '--initialize-at-build-time=org.slf4j.LoggerFactory,com.ctc.wstx.api.ReaderConfig,com.ctc.wstx.api.CommonConfig,com.ctc.wstx.util.DefaultXmlSymbolTable,com.ctc.wstx.stax.WstxInputFactory'
 
 	]
 }

@@ -22,6 +22,10 @@ phases:
       
   build:
     commands:
+      - echo Show Version gradle java docker
+      - ./gradlew --version
+      - java --version
+      - docker --version
       - echo Build started on `date`
       - echo Test
       - ./gradlew test
