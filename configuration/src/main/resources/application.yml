@@ -1,0 +1,14 @@
+app:
+  file:
+    path: /home/rafa/Project/sophi-storage/audios/
+server:
+  servlet:
+    context-path: /api/
+spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  devtools:
+    restart:
+      enabled: false

@@ -5,4 +5,11 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
+include ':application'
+include ':adapters:books-mongodb'
+include ':adapters:books-dynamodb'
+include ':adapters:audio-files'
+include ':test-data'
+include ':configuration'
+
 rootProject.name = 'sophi-books'

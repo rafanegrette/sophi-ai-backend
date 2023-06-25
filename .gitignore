@@ -42,6 +42,10 @@ gradle-app.setting
 .sts/
 .springBeans/
 
+.classpath
+.factorypath
+.project
+
 # IntelliJ IDEA files
 .idea/
 *.iws

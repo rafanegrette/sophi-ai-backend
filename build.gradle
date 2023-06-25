@@ -1,61 +1,30 @@
 plugins {
-	id 'org.springframework.boot' version '3.0.6'
-	id 'io.spring.dependency-management' version '1.1.0'
 	id 'java'
-	id 'org.graalvm.buildtools.native' version '0.9.20'
-	id 'io.freefair.lombok' version '8.0.1'
 }
 
-group = 'com.rafanegrette'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
-
-repositories {
-	mavenCentral()
+ext {
+	springBootVersion = '3.1.0'
 }
+subprojects {
+	group = 'com.rafanegrette'
+	version = '0.0.1-SNAPSHOT'
+	
+	sourceCompatibility = '17'
 
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-logging'
-	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.apache.pdfbox:pdfbox:2.0.28'
-	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.12.0'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	implementation "io.springfox:springfox-boot-starter:3.0.0"
-	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
-	implementation 'software.amazon.awssdk:s3'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux:2.5.4'
-	testImplementation 'io.projectreactor:reactor-test:3.4.24'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.testcontainers:junit-jupiter'
-	testImplementation 'org.testcontainers:mongodb'
-	testImplementation('org.mockito:mockito-junit-jupiter')
-	testImplementation "com.github.tomakehurst:wiremock:3.0.0-beta-8"
-}
+	apply plugin: 'java'
 
-configurations {
-    all {
-        exclude group: 'commons-logging', module: 'commons-logging'
-    }
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "org.testcontainers:testcontainers-bom:1.18.1"
-		mavenBom "software.amazon.awssdk:bom:2.20.42"
+	repositories {
+		mavenCentral()
 	}
-}
 
-test {
-	useJUnitPlatform()
-}
+	configurations {
+		all {
+			exclude group: 'commons-logging', module: 'commons-logging'
+		}
+	}
 
-bootBuildImage {
-	builder = 'paketobuildpacks/builder:tiny'
-	environment = [
-		'BP_NATIVE_IMAGE': 'true',
-	    'BP_NATIVE_IMAGE_BUILD_ARGUMENTS': '--initialize-at-build-time=org.slf4j.LoggerFactory,com.ctc.wstx.api.ReaderConfig,com.ctc.wstx.api.CommonConfig,com.ctc.wstx.util.DefaultXmlSymbolTable,com.ctc.wstx.stax.WstxInputFactory',
-		'BP_NATIVE_BUILD_MEMORY': '4G'
-	]
+	test {
+		useJUnitPlatform()
+	}
 }
 
