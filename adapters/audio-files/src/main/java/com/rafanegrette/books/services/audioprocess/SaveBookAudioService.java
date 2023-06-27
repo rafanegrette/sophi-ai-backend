@@ -11,8 +11,7 @@ import com.rafanegrette.books.port.out.SaveBookService;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
-@Qualifier("SaveBookAudioService")
+@Service("SaveBookAudioService")
 @RequiredArgsConstructor
 public class SaveBookAudioService implements SaveBookService {
 

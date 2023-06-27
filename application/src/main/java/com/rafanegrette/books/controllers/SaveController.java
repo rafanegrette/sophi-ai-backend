@@ -22,11 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("books")
 public class SaveController {
 
-    
     private SaveBookService saveBookService;
 
     @Autowired
-    public SaveController(@Qualifier("SaveBookDBService") SaveBookService saveBookService) {
+    public SaveController(@Qualifier("SaveBookCoordinatorService") SaveBookService saveBookService) {
         this.saveBookService = saveBookService;
     }
 

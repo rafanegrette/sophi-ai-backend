@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.rafanegrette.books.model.Book;
 import com.rafanegrette.books.model.mother.BookMother;
 import com.rafanegrette.books.port.out.SaveBookService;
+import com.rafanegrette.books.services.SaveBookCoordinatorService;
 import com.rafanegrette.books.services.SaveBookDBService;
 
 @WebMvcTest(SaveController.class)
@@ -31,9 +32,8 @@ public class SaveControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @MockBean
-    SaveBookDBService saveBookService;
-
+    @MockBean(name = "SaveBookCoordinatorService")
+    SaveBookService saveBookService;
 
     @Test
     void testSaveSuccess() throws Exception {

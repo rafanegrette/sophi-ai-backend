@@ -11,7 +11,8 @@ import org.springframework.test.context.TestPropertySource;
 						"azure.key=val3",
 						"azure.format=val4",
 						"azure.contentType=val5",
-						"aws.bucketName=val6"})
+						"aws.bucketName=val6",
+						"aws.region=us-east-59"})
 class SophiBooksApplicationTests {
 
 	@Test

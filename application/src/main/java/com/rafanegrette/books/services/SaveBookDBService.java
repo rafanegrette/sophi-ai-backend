@@ -14,8 +14,10 @@ import com.rafanegrette.books.model.Paragraph.ParagraphSeparator;
 import com.rafanegrette.books.port.out.BookRepository;
 import com.rafanegrette.books.port.out.SaveBookService;
 
-@Service
-@Qualifier("SaveBookDBService")
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service("SaveBookDBService")
 public class SaveBookDBService implements SaveBookService {
 
     private final BookRepository bookRepository;
@@ -27,11 +29,8 @@ public class SaveBookDBService implements SaveBookService {
 
     @Override
     public void save(Book book) {
-        var bookWithId = new Book(UUID.randomUUID().toString(),
-        book.title(),
-        book.contentTable(),
-        book.chapters());
-        bookRepository.save(bookWithId);
+    	log.info("Entering DB Save");
+        bookRepository.save(book);
     }
 
 }
