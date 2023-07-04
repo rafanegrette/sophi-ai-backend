@@ -27,8 +27,8 @@ class ReadTokenGeneratorITTest {
 		
 		assertNotNull(urlsPresigned);
 		
-		urlsPresigned.forEach(u -> 
-				log.info(u));
+		/*urlsPresigned.forEach(u -> 
+				log.info(u));*/
 		assertEquals(3, urlsPresigned.size());
 	}
 

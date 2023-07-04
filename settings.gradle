@@ -10,6 +10,7 @@ include ':adapters:books-mongodb'
 include ':adapters:books-dynamodb'
 include ':adapters:audio-files'
 include ':adapters:read-token'
+include ':adapters:open-api'
 include ':test-data'
 include ':configuration'
 

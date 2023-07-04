@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rafanegrette.books.model.SentenceAudio;
 import com.rafanegrette.books.port.out.SignedUrlsService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,11 +31,17 @@ public class AudioUrlsController {
 			SignedUrlsService signedUrlsService) {
 		this.signedUrlsService = signedUrlsService;
 	}
+	
 	@CrossOrigin
 	@GetMapping("/")
-	public ResponseEntity<List<String>> getSignedUrls(@RequestParam("pagePath") String pagePath) {
-		var urls = signedUrlsService.generateSignedUrls(pagePath);
-		if (urls.isEmpty()) return new ResponseEntity<>(urls, HttpStatus.NO_CONTENT);
-		return ResponseEntity.ok(urls);
+	public ResponseEntity<List<SentenceAudio>> getSignedUrls(@RequestParam("pagePath") String pagePath) {
+		try {
+			var sentencUrls = signedUrlsService.generateSignedUrls(pagePath);
+			if (sentencUrls.isEmpty()) return new ResponseEntity<>(sentencUrls, HttpStatus.NO_CONTENT);
+			return ResponseEntity.ok(sentencUrls);
+		} catch (Exception e) {
+			log.info(e.getMessage());
+			return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

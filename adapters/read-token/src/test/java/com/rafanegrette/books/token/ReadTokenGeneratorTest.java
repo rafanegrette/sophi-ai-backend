@@ -41,11 +41,12 @@ class ReadTokenGeneratorTest {
 	void testReadTokenGenerator() throws MalformedURLException {
 		
 		// given
-		var preSignUrls = List.of("https://s3skfjdkfj.com/sfdf/ldkjf", "https://s3.aws.com/sfk/lyrics");
-		var pagePath = "book-uid/4/2/3";
+		var preSignUrls = List.of("https://sophi-books.s3.amazonaws.com/d9eff110-0924-408e-98db-62be9cf3cfb0/1/1/1/0?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20230629T020154Z&X-Amz-SignedHeaders=host&X-Amz-Expires=14400&", 
+				"https://sophi-books.s3.amazonaws.com/d9eff110-0924-408e-98db-62be9cf3cfb0/1/1/1/2?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20230629T020154Z&X-Amz-SignedHeaders=host&X-Amz-Expires=14400&");
+		var pagePath = "d9eff110-0924-408e-98db-62be9cf3cfb0/1/1/";
 		var listResponse = ListObjectsV2Response.builder()
-				.contents(S3Object.builder().key("sfdf/ldkjf").build(),
-						S3Object.builder().key("sfk/lyrics").build())
+				.contents(S3Object.builder().key("1/0").build(),
+						S3Object.builder().key("1/2").build())
 				.build();
 		var presignedGetObjectRequest = Mockito.mock(PresignedGetObjectRequest.class);
 		// when

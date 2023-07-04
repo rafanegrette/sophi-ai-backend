@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @WireMockTest
 public class AzureSpeechServiceTest {
 
-    private AzureSpeechService azureSpeechServer;
+    private AzureSpeechService azureSpeechService;
 
 
     @Test
@@ -52,7 +52,7 @@ public class AzureSpeechServiceTest {
             .willReturn(ok(file.toString())));
 
         // when
-        byte[] result = azureSpeechServer.getBinaryFile(text);
+        byte[] result = azureSpeechService.getBinaryFile(text);
         
         // then
         assertNotNull(result);
@@ -65,7 +65,7 @@ public class AzureSpeechServiceTest {
             .baseUrl("http://localhost:" + port)
             .clientConnector(new ReactorClientHttpConnector())
             .build();
-        azureSpeechServer = new AzureSpeechService(webClient, audioParams);
+        azureSpeechService = new AzureSpeechService(webClient, audioParams);
     }
 
 }

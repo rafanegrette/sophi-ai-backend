@@ -12,7 +12,14 @@ import org.springframework.test.context.TestPropertySource;
 						"azure.format=val4",
 						"azure.contentType=val5",
 						"aws.bucketName=val6",
-						"aws.region=us-east-59"})
+						"aws.region=us-east-59",
+						"openai.authorization=textJDKLWJFK",
+						"openai.host=https://localhost.com", 
+						"openai.path=/api/audio", 
+						"openai.model=whiper", 
+						"openai.responseformat=text",
+						"openai.language=en", 
+						"openai.temperature=0.8"})
 class SophiBooksApplicationTests {
 
 	@Test

@@ -2,7 +2,7 @@ package com.rafanegrette.books.services.audioprocess;
 
 import java.util.function.Consumer;
 
-
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -18,13 +18,17 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class AzureSpeechService {
 
-    @NonNull
     private final WebClient webClientAzure;
 
     private final AzureAudioParams audioParams;
+    
+    public AzureSpeechService(@Qualifier("WebClientAzure") WebClient webClientAzure,
+    							AzureAudioParams audioParams) {
+    	this.webClientAzure = webClientAzure;
+    	this.audioParams = audioParams;
+    }
 
     public byte[] getBinaryFile(String text) {
 

@@ -6,14 +6,17 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.rafanegrette.books.model.SentenceAudio;
 import com.rafanegrette.books.port.out.SignedUrlsService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
+@Slf4j
 @Service("SignedUrlsService")
 @RequiredArgsConstructor
 public class ReadTokenGenerator implements SignedUrlsService {
@@ -24,7 +27,7 @@ public class ReadTokenGenerator implements SignedUrlsService {
 	private final S3Presigner presigner;
 	
 	
-	public List<String> generateSignedUrls(String pagePath) {
+	public List<SentenceAudio> generateSignedUrls(String pagePath) {
 
 		var listReq = ListObjectsV2Request.builder()
 				.bucket(bucketName)
@@ -40,8 +43,24 @@ public class ReadTokenGenerator implements SignedUrlsService {
 			var presignedGetObjectRequest = presigner.presignGetObject(getObjectPresignRequest);
 			return presignedGetObjectRequest.url().toString();
 							
-		}).toList();
+		}).map(this::transformToSentenceAudio).toList();
 		
+	}
+	
+	private SentenceAudio transformToSentenceAudio(String url) {
+		return new SentenceAudio(extractSentenceId(url), url);
+	}
+	
+	private String extractSentenceId(String url) {
+		// There is a constant of 74 char length: protocol://host/UUID/
+		try {
+			var subUrl = url.substring(74);
+			var values = subUrl.substring(0, subUrl.indexOf("?")).split("/");
+			return "/" + values[2] + "/" + values[3];
+		} catch(IndexOutOfBoundsException e) {
+			log.error(e.getMessage());
+			return "error for: " + url;
+		}
 	}
 
 }
