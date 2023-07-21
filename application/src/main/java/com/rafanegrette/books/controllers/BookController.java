@@ -53,12 +53,6 @@ public class BookController {
     }
     
     @CrossOrigin
-    @DeleteMapping(value = "{bookId}")
-    public void deleteBook(@PathVariable("bookId") String bookId) {
-    	
-    }
-    
-    @CrossOrigin
     @GetMapping("/{bookId}/chapters/{chapterId}/pages/{pageId}")
     public PageDTO getPage(@PathVariable("bookId") String bookId,
                         @PathVariable("chapterId") int indexChapter,

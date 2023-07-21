@@ -1,21 +1,14 @@
 package com.rafanegrette.books.services.audioprocess;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.transfer.s3.S3TransferManager;
-import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
-import software.amazon.awssdk.transfer.s3.progress.LoggingTransferListener;
 
 @Slf4j
 @Component

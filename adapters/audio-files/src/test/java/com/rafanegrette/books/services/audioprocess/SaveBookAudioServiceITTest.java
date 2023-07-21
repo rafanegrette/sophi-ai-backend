@@ -14,7 +14,7 @@ import com.rafanegrette.books.services.audioprocess.configure.AWSConfiguration;
 import com.rafanegrette.books.services.audioprocess.configure.AzureAudioParams;
 import com.rafanegrette.books.services.audioprocess.configure.AzureConfiguration;
 
-@Disabled
+//@Disabled
 @SpringBootTest(classes = {
 		SaveBookAudioService.class,
 		AzureSpeechService.class,

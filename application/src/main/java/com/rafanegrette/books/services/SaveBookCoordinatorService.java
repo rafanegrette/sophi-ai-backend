@@ -17,8 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 //@RequiredArgsConstructor
 public class SaveBookCoordinatorService implements SaveBookService {
 
-    SaveBookService saveBookDBService;
-    SaveBookService saveBookAudioService;
+    private final SaveBookService saveBookDBService;
+    private final SaveBookService saveBookAudioService;
 
     public SaveBookCoordinatorService(@Qualifier("SaveBookDBService")
     					SaveBookService saveBookDBService, 

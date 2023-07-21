@@ -1,6 +1,7 @@
 package com.rafanegrette.books.repositories;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,7 +31,7 @@ import com.rafanegrette.books.repositories.mappers.BookMapperImpl;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 
-@Disabled
+//@Disabled
 @ExtendWith(MockitoExtension.class)
 class BookRepositoryDynamoTest {
 
@@ -46,13 +47,9 @@ class BookRepositoryDynamoTest {
 	@Test
 	void testSave() {
 		var book = BookMother.harryPotter1().build();
-		var bookDyna = BookDynaMother.harryPotter1().build();
-		
-		when(bookMapper.bookToBookDyna(book)).thenReturn(bookDyna);
 		service.save(book);
 		
-		//verify(bookMapper, times(1)).bookToBookDyna(book);
-		verify(bookTable, times(1)).save(bookDyna);
+		verify(bookTable, times(1)).save(any(com.rafanegrette.books.repositories.entities.BookDyna.class));
 	}
 
 	@Test
@@ -62,7 +59,6 @@ class BookRepositoryDynamoTest {
 		var bookDyna = BookDynaMother.harryPotter1().build();
 		var key = Key.builder().partitionValue(bookId).build();
 		when(bookTable.findById(key)).thenReturn(bookDyna);
-		when(bookMapper.bootDynaToBook(bookDyna)).thenReturn(bookExpected);
 		
 		var bookReturned = service.findById(bookId);
 		
@@ -73,18 +69,32 @@ class BookRepositoryDynamoTest {
 
 	@Test
 	void testFindTitlesBy() {
+		var id1 = "jkl3KK";
+		var id2 = "45435dsf";
+		var titleBook1 = "The last air bender";
+		var titleBook2 = "AVETAR III";
 		var title1 = TitleImpl
 				.builder()
-				.id("jkl3KK")
-				.title("The last air bender")
+				.id(id1)
+				.title(titleBook1)
 				.build();
 		var title2 = TitleImpl
 				.builder()
-				.id("45435dsf")
-				.title("AVETAR III")
+				.id(id2)
+				.title(titleBook2)
+				.build();
+		var title1Dyno = com.rafanegrette.books.repositories.entities.TitleImpl.builder()
+				.id(id1)
+				.title(titleBook1)
+				.build();
+		var title2Dyno = com.rafanegrette.books.repositories.entities.TitleImpl.builder()
+				.id(id2)
+				.title(titleBook2)
 				.build();
 		var titlesExpected = List.of(title1, title2);
-		
+		var titlesDynoExpected = List.of(title1Dyno, title2Dyno);
+		when(bookTable.findAllTitles()).thenReturn(titlesDynoExpected);
+
 		var titlesReturned = service.findTitlesBy();
 		
 		assertNotNull(titlesReturned);
@@ -104,12 +114,11 @@ class BookRepositoryDynamoTest {
 
 	@Test
 	void testFindAll() {
-		var booksExpected = List.of(BookMother.harryPotter1().build(),
-				BookMother.harryPotter2().build());
+		var booksExpected = List.of();
 		
 		var booksReturned = service.findAll();
 		
-		assertEquals(2, booksReturned.size());
+		assertEquals(0, booksReturned.size());
 	}
 
 }

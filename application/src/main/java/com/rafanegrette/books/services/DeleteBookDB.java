@@ -1,8 +1,11 @@
 package com.rafanegrette.books.services;
 
+import org.springframework.stereotype.Service;
+
 import com.rafanegrette.books.port.out.BookRepository;
 
-public class DeleteBookDB implements DeleteBookService{
+@Service("DeleteBookDB")
+public class DeleteBookDB implements DeleteBookService {
 
     private final BookRepository bookRepository;
 

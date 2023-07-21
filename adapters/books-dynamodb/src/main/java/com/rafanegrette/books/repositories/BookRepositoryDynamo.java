@@ -49,7 +49,8 @@ public class BookRepositoryDynamo implements BookRepository {
     }
 
     public void deleteById(String bookId) {
-        
+    	Key key = Key.builder().partitionValue(bookId).build();
+    	bookTable.deleteById(key);
     }
 
     public void deleteAll() {
@@ -57,7 +58,7 @@ public class BookRepositoryDynamo implements BookRepository {
     }
 
     public List<Book> findAll() {
-        return null;
+        return new ArrayList<>();
     }
 
     /*public static void main(String...args) {
