@@ -17,11 +17,12 @@ public class BookDyna implements Serializable {
 					 
 	String id; 
 	String title;
+	String label;
     List<ContentIndexDyna> contentTable;
     List<ChapterDyna> chapters;
 
 	
-    public static final BookDyna EMPTY_BOOK = new BookDyna("", "", new ArrayList<>(), new ArrayList<>());
+    public static final BookDyna EMPTY_BOOK = new BookDyna("", "", "", new ArrayList<>(), new ArrayList<>());
 
     @DynamoDbPartitionKey
 	public String getId() {
@@ -33,6 +34,9 @@ public class BookDyna implements Serializable {
 		return title;
 	}
 
+	public String getLabel() {
+		return label;
+	}
 
 	public List<ContentIndexDyna> getContentTable() {
 		return contentTable;
@@ -53,6 +57,9 @@ public class BookDyna implements Serializable {
 		this.title = title;
 	}
 
+	public void setLabel(String label) {
+		this.label = label;
+	}
 
 	public void setContentTable(List<ContentIndexDyna> contentTable) {
 		this.contentTable = contentTable;

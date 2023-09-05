@@ -37,8 +37,8 @@ public class ProcessContentPagePDF implements ContentPage {
     public LinkedList<Sentence> formatSentences(List<Sentence> sentences) {
 
         return sentences.stream().map(s -> 
-                    new Sentence(s.id(), s.text().replace("’", "'"))
-                    //.replace("\n", " ")
+                    new Sentence(s.id(), s.text().replace("’", "'")
+                    		.replace("\n", " "))
                     ).collect(Collectors.toCollection(LinkedList::new));
     }
 
@@ -117,8 +117,8 @@ public class ProcessContentPagePDF implements ContentPage {
                 if (Character.isLowerCase(currentChar))
                 {
                 	try {
-                    return sentence.substring(1, idxTitleEnd)
-                    		+ sentence.charAt(0)
+                    return sentence.substring(1, idxTitleEnd) + ".\n"
+                    		+ sentence.charAt(0) 
                     		+ sentence.substring(idxTitleEnd);
                 	} catch(Exception e) {
                 		System.out.println(e.getMessage());

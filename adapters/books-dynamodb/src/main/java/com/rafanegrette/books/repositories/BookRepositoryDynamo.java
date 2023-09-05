@@ -8,6 +8,7 @@ import java.util.Optional;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,9 @@ import com.rafanegrette.books.repositories.entities.mother.BookMother;
 import com.rafanegrette.books.repositories.mappers.BookMapper;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @AllArgsConstructor
 @Component
 @Primary
@@ -42,7 +45,7 @@ public class BookRepositoryDynamo implements BookRepository {
     }
 
     public List<Title> findTitlesBy() {
-    	List<TitleImpl> titlesValue = bookTable.findAllTitles().stream().map(t -> new TitleImpl(t.getId(), t.getTitle())).toList();
+    	List<TitleImpl> titlesValue = bookTable.findAllTitles().stream().map(t -> new TitleImpl(t.getId(), t.getTitle(), t.getLabel())).toList();
         List<Title> titles = new ArrayList<>();
         titles.addAll(titlesValue);
     	return titles;
@@ -50,7 +53,11 @@ public class BookRepositoryDynamo implements BookRepository {
 
     public void deleteById(String bookId) {
     	Key key = Key.builder().partitionValue(bookId).build();
-    	bookTable.deleteById(key);
+    	try {
+    		bookTable.deleteById(key);
+    	} catch (DynamoDbException de) {
+    		log.error("Deleting the book with id: {}, detail error: {}", bookId, de);
+    	}
     }
 
     public void deleteAll() {

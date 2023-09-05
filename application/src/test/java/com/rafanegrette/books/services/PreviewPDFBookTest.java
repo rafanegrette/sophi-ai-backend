@@ -36,12 +36,13 @@ class PreviewPDFBookTest {
     @Test
     void testPreviewPDF() throws IOException {
         //GIVEN
+    	String label = "Chapter 1";
         String title = "New adventures";
         String bookId = "Adventure-1";
         List<ContentIndex> indexes = List.of(new ContentIndex(0, "Adventure 1"), 
                 new ContentIndex(1, "Adventure 2"), 
                 new ContentIndex(2, "Adventure 3"));
-        Book book = new Book(bookId,title, indexes, null);
+        Book book = new Book(bookId, title, label, indexes, null);
 
         String bookStr = Files.readString(Path.of("./src/test/resources/base64Test.txt"));
         byte[] bookByte = Base64Utils.decodeFromString(bookStr);

@@ -9,5 +9,5 @@ public class TitleImpl implements Title {
 
     private String id;
     private String title; 
-    
+    private String label;
 }

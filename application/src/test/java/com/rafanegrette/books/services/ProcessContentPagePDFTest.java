@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -44,8 +46,11 @@ class ProcessContentPagePDFTest {
     
     @BeforeAll
     static void beforeAll() throws IOException {
-        document = getDocumentWithParagraph();
-        documentTC2 = getDocumentWithParagraph();
+    	BiConsumer<PDDocument, PDPage> pageContentFunction = (doc, page) -> setPageContent(doc, page);
+    	BiConsumer<PDDocument, PDPage> pageContentFunctionTC2 = (doc, page) -> setPageContentTC2(doc, page);
+    	
+        document = getDocumentWithParagraph(pageContentFunction);
+        documentTC2 = getDocumentWithParagraph(pageContentFunctionTC2);
     }
     
     @Test
@@ -244,7 +249,7 @@ class ProcessContentPagePDFTest {
     	
     }
     
-    static private PDDocument getDocumentWithParagraph() {
+    static private PDDocument getDocumentWithParagraph(BiConsumer<PDDocument, PDPage> pageContentFunction) {
         PDDocument document = new PDDocument();
 
         PDDocumentOutline outline = new PDDocumentOutline();
@@ -253,7 +258,7 @@ class ProcessContentPagePDFTest {
         for (int i = 0; i <= 17; i++) {
         
             PDPage page = new PDPage(PDRectangle.A4);          
-            setPageContent(document, page);
+            pageContentFunction.accept(document, page);
             
             document.addPage(page);
 
@@ -266,7 +271,7 @@ class ProcessContentPagePDFTest {
 
             for (int pageNo = 0; pageNo <= 3; pageNo ++) {
                 PDPage page1 = new PDPage(PDRectangle.A4);
-                setPageContent(document, page1);
+                pageContentFunction.accept(document, page1);
                 document.addPage(page1);
             }
             
@@ -312,6 +317,32 @@ class ProcessContentPagePDFTest {
         } catch (IOException e) {
             fail("Getting document with paragraph");
         }
+    }
+    
+    static private void setPageContentTC2(PDDocument document, PDPage page) {
+        try {
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            contentStream.beginText();
+            contentStream.newLineAtOffset(50, 700);
+            contentStream.showText("B");
+            contentStream.newLineAtOffset(20, 700);
+            contentStream.showText(" ");
+            contentStream.newLineAtOffset(20, 700);
+            contentStream.showText("EPISODE  ONE");
+            contentStream.newLineAtOffset(50, 700);
+            contentStream.showText("DOLVI'S RECOMMENDATION");
+            contentStream.newLineAtOffset(20, 700);
+            contentStream.showText("arry worked too well for a student, but it was worse than he think. The little");
+            contentStream.newLineAtOffset(0, 700);
+            contentStream.showText("task was spoiled and very bad, not functional to work with green eyes");
+            contentStream.newLineAtOffset(20, 700);
 
+            contentStream.showText("the size of futball balls.");
+            contentStream.endText();
+            contentStream.close();
+        } catch (IOException e) {
+            fail("Getting document with paragraph");
+        }
     }
 }

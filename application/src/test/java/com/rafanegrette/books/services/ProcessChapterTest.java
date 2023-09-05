@@ -75,10 +75,10 @@ public class ProcessChapterTest {
         		true);
         PDDocument document = getDocumentWithFixTitleHP1();
         List<Page> pagesExpected = processChapterPDF.getPages(document, chapterNo, formParameter);
-        assertEquals("PAGE TITLE \n"
-        		+ "PROLOGE \n"
-        		+ "Prologe after title", 
+        assertEquals("PAGE TITLE  PROLOGE", 
         		pagesExpected.get(0).paragraphs().get(0).sentences().get(0).text());
+        assertEquals("Prologe after title", 
+        		pagesExpected.get(0).paragraphs().get(1).sentences().get(0).text());
     }
 
     @Test

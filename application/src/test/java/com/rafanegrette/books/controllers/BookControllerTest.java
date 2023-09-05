@@ -63,7 +63,7 @@ class BookControllerTest {
     @Test
     void testGetBook() throws Exception {
         //GIVEN
-        Optional<Book> harryBook = Optional.of(new Book("Harry-1", "Harry Potter and the Sorcerer's Stone", null, null));
+        Optional<Book> harryBook = Optional.of(new Book("UID-32432K", "Harry Potter and the Sorcerer's Stone", "Harry-1", null, null));
         //WHEN
         when(readBookService.getBook("Harry-1")).thenReturn(harryBook);
         MvcResult mvcResult = this.mockMvc.perform(get("/books/{bookId}", "Harry-1")).andExpect(status().isOk()).andReturn();

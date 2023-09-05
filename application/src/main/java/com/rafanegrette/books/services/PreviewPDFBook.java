@@ -33,7 +33,12 @@ public class PreviewPDFBook implements PreviewBookService{
         		uploadForm.firstPageOffset().equals(1) ? 
         				FirstPageOffset.ONE 
         				: FirstPageOffset.TWO;
-        var formParameter = new FormParameter(uploadForm.bookName(), separator, chapterTitleType, firstPageOffset, uploadForm.fixTitleHP1());
+        var formParameter = new FormParameter(
+        		uploadForm.bookLabel(),        		
+        		separator, 
+        		chapterTitleType, 
+        		firstPageOffset, 
+        		uploadForm.fixTitleHP1());
         byte[] byteFile = Base64Utils.decodeFromString(uploadForm.file());
         
         return pdfService.getBookFromByteFile(byteFile, formParameter);

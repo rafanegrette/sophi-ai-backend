@@ -38,9 +38,9 @@ public class DynamoDBBookTable implements DBBookTable {
 	@Override
 	public List<TitleImpl> findAllTitles() {
 		var scanEnhancedRequest = ScanEnhancedRequest.builder()
-				.attributesToProject("id", "title")
+				.attributesToProject("id", "title", "label")
 				.build();
-		return bookTable.scan(scanEnhancedRequest).items().stream().map(b -> new TitleImpl(b.getId(), b.getTitle())).toList();
+		return bookTable.scan(scanEnhancedRequest).items().stream().map(b -> new TitleImpl(b.getId(), b.getTitle(), b.getLabel())).toList();
 	}
 
 	

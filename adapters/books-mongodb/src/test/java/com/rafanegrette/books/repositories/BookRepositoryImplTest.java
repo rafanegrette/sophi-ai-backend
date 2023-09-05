@@ -79,7 +79,7 @@ public class BookRepositoryImplTest {
     @Test
     public void testFindTitlesBy() {
         // given
-        Title title = new TitleImpl("Harry-1", "The stone I don't know");
+        Title title = new TitleImpl("Harry-1", "The stone I don't know", "label 1");
         // when
         when(persistentRepository.findTitlesBy()).thenReturn(List.of(title));
         List<Title> titlesReturned = bookRepositoryImpl.findTitlesBy();

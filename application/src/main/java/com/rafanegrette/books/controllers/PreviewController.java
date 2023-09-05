@@ -40,7 +40,7 @@ public class PreviewController {
     @PostMapping(value = "/preview", consumes = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody Book previewPDF(@RequestBody UploadForm uploadForm) {
         try {
-            LOGGER.info("upload PDF: {}", uploadForm.bookName());
+            LOGGER.info("upload PDF: {}", uploadForm.bookLabel());
             Book book = previewService.previewPDF(uploadForm);
             return book;
         } catch (IOException e) {

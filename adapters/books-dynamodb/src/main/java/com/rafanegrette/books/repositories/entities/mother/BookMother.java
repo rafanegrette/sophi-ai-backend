@@ -13,6 +13,7 @@ public class BookMother {
     public static BookBuilder harryPotter1() {
         return harryPotter1
                 .id("Harry-1")
+                .label("label 1")
                 .title("Harry Potter and the Sorcerer's Stone")
                 .chapters(List.of(ChapterMother.potterChapter1().build(),
                         ChapterMother.potterChapter2().build()));
@@ -21,13 +22,14 @@ public class BookMother {
     public static BookBuilder harryPotter2() {
         return harryPotter1
                 .id("Harry-2")
+                .label("label 2")
                 .title("Harry Potter and the forty thieves")
                 .chapters(List.of(ChapterMother.potterChapter1().build(),
                         ChapterMother.potterChapter2().build()));
     }
     
     public static class BookBuilder {
-        private String title, id;
+        private String title, id, label;
         private List<ContentIndexDyna> contentTable;
         private List<ChapterDyna> chapters;
         
@@ -41,6 +43,11 @@ public class BookMother {
             return this;
         }
         
+        public BookBuilder label(String label) {
+        	this.label = label;
+        	return this;
+        }
+        
         public BookBuilder contentTable(List<ContentIndexDyna> contentTable) {
             this.contentTable = contentTable;
             return this;
@@ -52,7 +59,7 @@ public class BookMother {
         }
         
         public BookDyna build() {
-            return new BookDyna(id, title, contentTable, chapters);
+            return new BookDyna(id, title, label, contentTable, chapters);
         }
     }
 

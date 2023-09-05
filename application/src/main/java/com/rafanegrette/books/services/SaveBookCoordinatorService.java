@@ -34,11 +34,13 @@ public class SaveBookCoordinatorService implements SaveBookService {
     	
         var bookWithId = new Book(UUID.randomUUID().toString(),
         book.title(),
+        book.label(),
         book.contentTable(),
         book.chapters());
         
         saveBookDBService.save(bookWithId);
         saveBookAudioService.save(bookWithId);
+        log.info("Saved book id: {}", bookWithId.id());
     }
     
 }

@@ -72,13 +72,17 @@ public class ProcessBookPDF implements LoadPDFService {
 
     private Book getBook(PDDocument document, FormParameter formParameter) throws IOException {
         List<ContentIndex> bookMarks = getOutline(document);
-        String originalFitle = document.getDocumentInformation().getTitle();
+        String originalTitle = document.getDocumentInformation().getTitle();
         List<Chapter> chapters = new ArrayList<>();
         for (int i = 2; i <= bookMarks.size() + 1; i++) {
             Chapter chapter = processChapterPDF.getChapterByIndex(document, i, formParameter);
             chapters.add(chapter);
         }
-        Book book = new Book(formParameter.title(), originalFitle, bookMarks, chapters);
+        Book book = new Book(formParameter.labelName(), 
+        		originalTitle, 
+        		formParameter.labelName(),
+        		bookMarks, 
+        		chapters);
         document.close();
         return book;
     }
