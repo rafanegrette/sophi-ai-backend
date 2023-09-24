@@ -1,11 +1,6 @@
 plugins {
-	id 'org.springframework.boot' version '3.1.0'
-    id 'io.freefair.lombok' version '8.0.1'
-	id 'org.graalvm.buildtools.native' version '0.9.20'
-}
-
-springBoot {
-	mainClass = "com.rafanegrette.books.SophiBooksApplication"
+	id 'org.springframework.boot' version '3.1.1'
+	//id 'org.graalvm.buildtools.native' version '0.9.20'
 }
 
 dependencies {
@@ -14,11 +9,10 @@ dependencies {
 	implementation project(':adapters:audio-files')
 	implementation project(':adapters:read-token')
 	implementation project(':adapters:open-api')
-	implementation 'org.springframework.boot:spring-boot-starter:3.1.0'
-	//developmentOnly 'org.springframework.boot:spring-boot-devtools:3.1.0'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.1.0'
+	implementation 'org.springframework.boot:spring-boot-starter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
-
+/*
 bootBuildImage {
 	builder = 'paketobuildpacks/builder:tiny'
 	environment = [
@@ -27,3 +21,5 @@ bootBuildImage {
 		'BP_NATIVE_BUILD_MEMORY': '4G'
 	]
 }
+
+ */

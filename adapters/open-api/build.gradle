@@ -1,12 +1,8 @@
-plugins {
-    id 'io.freefair.lombok' version '8.0.1'
-}
-
 dependencies {
 	implementation project(':application')
-    implementation 'org.springframework:spring-context:6.0.9'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux:3.1.0'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation "com.github.tomakehurst:wiremock:3.0.0-beta-8"
 }
 
