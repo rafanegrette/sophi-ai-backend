@@ -35,13 +35,7 @@ subprojects {
 			mavenBom("org.springframework.boot:spring-boot-dependencies:${versions.springBoot}")
 		}
 	}
-/*
-	configurations {
-		all {
-			exclude group: 'commons-logging', module: 'commons-logging'
-		}
-	}
-*/
+
 	test {
 		useJUnitPlatform()
 	}

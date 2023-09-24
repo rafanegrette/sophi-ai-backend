@@ -5,9 +5,3 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation "com.github.tomakehurst:wiremock:3.0.0-beta-8"
 }
-
-configurations.all {
-    resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.14.5'
-    }
-}

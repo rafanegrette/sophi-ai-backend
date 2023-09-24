@@ -15,14 +15,3 @@ dependencies {
 	testImplementation 'org.testcontainers:dynalite:1.18.3'
     
 }
-
-configurations {
-    all {
-    	resolutionStrategy {
-        	force 'net.bytebuddy:byte-buddy:1.14.5'
-    	}
-        exclude group: 'org.slf4j', module: 'slf4j-nop'
-        exclude group: 'junit', module: 'junit'
-
-    }
-}

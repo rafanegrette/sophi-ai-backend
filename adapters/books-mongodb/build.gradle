@@ -7,9 +7,3 @@ dependencies {
     testImplementation('org.mockito:mockito-junit-jupiter')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
-
-configurations.all {
-    resolutionStrategy {
-        force 'net.bytebuddy:byte-buddy:1.14.5'
-    }
-}
