@@ -17,10 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rafanegrette.books.model.SentenceAudio;
 import com.rafanegrette.books.port.out.SignedUrlsService;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @RestController
 @RequestMapping("signed-urls")
 public class AudioUrlsController {
@@ -40,7 +36,6 @@ public class AudioUrlsController {
 			if (sentencUrls.isEmpty()) return new ResponseEntity<>(sentencUrls, HttpStatus.NO_CONTENT);
 			return ResponseEntity.ok(sentencUrls);
 		} catch (Exception e) {
-			log.info(e.getMessage());
 			return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
