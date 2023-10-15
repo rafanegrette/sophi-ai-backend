@@ -51,7 +51,6 @@ gradle-app.setting
 *.iws
 *.iml
 *.ipr
-out/
 target/
 
 # VS Code files
