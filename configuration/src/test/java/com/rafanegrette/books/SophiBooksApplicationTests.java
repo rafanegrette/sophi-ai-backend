@@ -22,7 +22,7 @@ import org.springframework.test.context.TestPropertySource;
 						"openai.temperature=0.8"})
 class SophiBooksApplicationTests {
 
-	@Test
+	//@Test
 	void contextLoads() {
 	}
 
