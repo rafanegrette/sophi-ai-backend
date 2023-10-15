@@ -1,5 +1,4 @@
 rootProject.name = 'sophi-books'
 include ':application'
-include ':configuration'
 
 
