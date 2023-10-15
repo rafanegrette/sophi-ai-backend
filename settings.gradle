@@ -1,3 +1,4 @@
+rootProject.name = 'sophi-books'
 include ':application'
 include ':adapters:books-mongodb'
 include ':adapters:books-dynamodb'
@@ -7,4 +8,4 @@ include ':adapters:open-api'
 include ':test-data'
 include ':configuration'
 
-rootProject.name = 'sophi-books'
+
