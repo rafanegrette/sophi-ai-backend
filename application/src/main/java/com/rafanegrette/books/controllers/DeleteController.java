@@ -22,7 +22,7 @@ public class DeleteController {
 	public DeleteController(@Qualifier("DeleteBookCoordinatorService") DeleteBookService deleteBookService) {
 		this.deleteBookService = deleteBookService;
 	}
-    @CrossOrigin
+    //@CrossOrigin
     @DeleteMapping(value = "{bookId}")
     public ResponseEntity<Void> deleteBook(@PathVariable("bookId") String bookId) {
     		deleteBookService.deleteBook(bookId);

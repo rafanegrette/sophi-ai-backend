@@ -1,13 +1,13 @@
 package com.rafanegrette.books.model;
 
-import com.rafanegrette.books.model.Paragraph.ParagraphSeparator;
+import com.rafanegrette.books.model.formats.ParagraphFormats;
 
 public record FormParameter(
 		String labelName,
-        ParagraphSeparator paragraphSeparator,
+        ParagraphFormats paragraphFormats,
         ChapterTitleType bookMarkType,
         FirstPageOffset firstPageOffset,
-        boolean fixTitleHP1) {
+        boolean fixTitleHP2) {
 
 
 }

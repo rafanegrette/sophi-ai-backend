@@ -1,11 +1,9 @@
 package com.rafanegrette.books.services;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.any;
 
-import java.util.List;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -17,10 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.rafanegrette.books.model.Book;
-import com.rafanegrette.books.model.ChapterTitleType;
-import com.rafanegrette.books.model.ContentIndex;
-import com.rafanegrette.books.model.FirstPageOffset;
-import com.rafanegrette.books.model.Paragraph.ParagraphSeparator;
 import com.rafanegrette.books.model.mother.BookMother;
 import com.rafanegrette.books.port.out.BookRepository;
 

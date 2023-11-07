@@ -2,47 +2,52 @@ package com.rafanegrette.books.services;
 
 import java.io.IOException;
 
+import com.rafanegrette.books.model.*;
+import com.rafanegrette.books.model.formats.ParagraphFormats;
+import com.rafanegrette.books.model.formats.ParagraphSeparator;
+import com.rafanegrette.books.model.formats.ParagraphThreshold;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 
-import com.rafanegrette.books.model.Book;
-import com.rafanegrette.books.model.ChapterTitleType;
-import com.rafanegrette.books.model.FirstPageOffset;
-import com.rafanegrette.books.model.FormParameter;
-import com.rafanegrette.books.model.UploadForm;
-import com.rafanegrette.books.model.Paragraph.ParagraphSeparator;
-
 @Service
-public class PreviewPDFBook implements PreviewBookService{
+public class PreviewPDFBook implements PreviewBookService {
 
-	private LoadPDFService pdfService;
-	
-	public PreviewPDFBook(LoadPDFService loadPdfService) {
-		this.pdfService = loadPdfService;
-	}
-	
+    private LoadPDFService pdfService;
+
+    public PreviewPDFBook(LoadPDFService loadPdfService) {
+        this.pdfService = loadPdfService;
+    }
+
     @Override
     public Book previewPDF(UploadForm uploadForm) throws IOException {
         ParagraphSeparator separator = uploadForm.paragraphSeparator().equals("ONE") ? ParagraphSeparator.ONE_JUMP
                 : ParagraphSeparator.TWO_JUMP;
         ChapterTitleType chapterTitleType = uploadForm.bookMarkType() == null ||
-        		uploadForm.bookMarkType().equals(ChapterTitleType.BOOKMARK.toString())
+                uploadForm.bookMarkType().equals(ChapterTitleType.BOOKMARK.toString())
                 ? ChapterTitleType.BOOKMARK
                 : ChapterTitleType.CONTENT;
-        FirstPageOffset firstPageOffset = uploadForm.firstPageOffset() == null ||
-        		uploadForm.firstPageOffset().equals(1) ? 
-        				FirstPageOffset.ONE 
-        				: FirstPageOffset.TWO;
-        var formParameter = new FormParameter(
-        		uploadForm.bookLabel(),        		
-        		separator, 
-        		chapterTitleType, 
-        		firstPageOffset, 
-        		uploadForm.fixTitleHP1());
-        byte[] byteFile = Base64Utils.decodeFromString(uploadForm.file());
-        
+		var formParameter = getFormParameters(uploadForm, separator, chapterTitleType);
+
+		byte[] byteFile = Base64Utils.decodeFromString(uploadForm.file());
+
         return pdfService.getBookFromByteFile(byteFile, formParameter);
+    }
+
+	private static FormParameter getFormParameters(UploadForm uploadForm, ParagraphSeparator separator, ChapterTitleType chapterTitleType) {
+		FirstPageOffset firstPageOffset = uploadForm.firstPageOffset() == null ||
+				uploadForm.firstPageOffset().equals(1) ?
+				FirstPageOffset.ONE
+				: FirstPageOffset.TWO;
+		var paragraphThreshold = uploadForm.paragraphThreshold() == 300 ? ParagraphThreshold.THREE
+				: ParagraphThreshold.DEFAULT;
+		var formParameter = new FormParameter(
+				uploadForm.bookLabel(),
+				new ParagraphFormats(paragraphThreshold, uploadForm.extraFormat(), separator),
+				chapterTitleType,
+				firstPageOffset,
+				uploadForm.fixTitleHP1());
+		return formParameter;
 	}
 
-	
+
 }

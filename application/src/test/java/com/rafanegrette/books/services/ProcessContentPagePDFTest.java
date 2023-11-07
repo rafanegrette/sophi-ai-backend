@@ -2,14 +2,14 @@ package com.rafanegrette.books.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
+import com.rafanegrette.books.model.formats.ParagraphFormats;
+import com.rafanegrette.books.model.formats.ParagraphSeparator;
+import com.rafanegrette.books.model.formats.ParagraphThreshold;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -26,7 +26,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.ResourceUtils;
 
 import com.rafanegrette.books.model.Page;
-import com.rafanegrette.books.model.Paragraph.ParagraphSeparator;
 import com.rafanegrette.books.model.Sentence;
 
 @SpringBootTest(classes = {ContentPage.class, ProcessContentPagePDF.class})
@@ -43,7 +42,60 @@ class ProcessContentPagePDFTest {
     final int PAGE_NO_7 = 11;
     final int CHAPTER_NO_5 = 4;
     final int PAGE_NO_MULTI_LINE_IN_CHAPTER_5 = 3;
-    
+
+    private final String textTC3 = """
+                        
+                        
+            5
+                        
+            Joseph Jacobs
+                        
+            ENGLISH
+            FAIRY TALES
+                        
+            COLLECTED BY
+                        
+            JOSEPH JACOBS
+            HOW TO GET INTO THIS BOOK.
+                        
+                     Knock at the Knocker on the Door,
+                     Pull the Bell at the side,
+                        
+            Then, if you are very quiet, you will hear a teeny tiny voice say
+            through the grating “Take down the Key.” This you will find at
+            the back: you cannot mistake it, for it has J. J. in the wards. Put
+            the Key in the Keyhole, which it fits exactly, unlock the door and
+            WALK IN.
+                        
+            TO MY DEAR LITTLE MAY
+                        
+            Preface
+                        
+            WHO SAYS that English folk have no fairy-tales of their own?
+            The present volume contains only a selection out of some
+            140, of which I have found traces in this country. It is prob-
+            able that many more exist.
+                        
+            A quarter of the tales in this volume, have been collected
+            during the last ten years or so, and some of them have not
+            been hitherto published. Up to 1870 it was equally said of
+            France and of Italy, that they possessed no folk-tales. Yet,
+            within fifteen years from that date, over 1000 tales had been
+            collected in each country. I am hoping that the present vol-
+            ume may lead to equal activity in this country, and would
+            earnestly beg any reader of this book who knows of similar
+            tales, to communicate them, written down as they are told,
+            to me, care of Mr. Nutt. The only reason, I imagine, why
+            such tales have not hitherto been brought to light, is the
+            lamentable gap between the governing and recording classes
+            and the dumb working classes of this country—dumb to
+            others but eloquent among themselves. It would be no un-
+            patriotic task to help to bridge over this gulf, by giving a
+                        
+                        
+                        
+            """;
+
     @BeforeAll
     static void beforeAll() throws IOException {
     	BiConsumer<PDDocument, PDPage> pageContentFunction = (doc, page) -> setPageContent(doc, page);
@@ -52,7 +104,14 @@ class ProcessContentPagePDFTest {
         document = getDocumentWithParagraph(pageContentFunction);
         documentTC2 = getDocumentWithParagraph(pageContentFunctionTC2);
     }
-    
+
+    @Test
+    void testGetParagraphs() {
+        var paragraphFormatsExtra = new ParagraphFormats(ParagraphThreshold.THREE, true, ParagraphSeparator.TWO_JUMP);
+        var paragraphs =processContentPage.getParagraphs(textTC3, paragraphFormatsExtra);
+
+        assertEquals(11, paragraphs.size());
+    }
     @Test
     void testSplitSentencesRemoveSecondCharInFirstPageOfChapters() {
         String sentence = "This is not ok";
@@ -153,14 +212,32 @@ class ProcessContentPagePDFTest {
     
     @Test
     void testGetPageWithSeparator() throws IOException {
-        Page pageExpected = processContentPage.getContentPage(document, 6, ParagraphSeparator.TWO_JUMP);
+        var paragraphFormats = new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP);
+        Page pageExpected = processContentPage.getContentPage(document, 6, paragraphFormats);
         assertEquals("Page Title", pageExpected.paragraphs().get(0).sentences().get(0).text());
+    }
+
+    @Test
+    void testGetPageThreshold() throws IOException {
+        // Given
+        var paragraphFormatsDefault = new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP);
+        var paragraphFormatsExtra = new ParagraphFormats(ParagraphThreshold.THREE, true, ParagraphSeparator.TWO_JUMP);
+
+        // When
+        Page pageDefaultFormat = processContentPage.getContentPage(document, 6, paragraphFormatsDefault);
+        Page pageExtraFormat = processContentPage.getContentPage(document, 6, paragraphFormatsExtra);
+
+        // Then
+        assertEquals(4, pageExtraFormat.paragraphs().size());
+        assertEquals(3, pageDefaultFormat.paragraphs().size());
     }
 
     @Test
     void testGetContentPageRightParagraphNumbeersTC2() throws IOException {
         int paragraphsNoExpected = 2;
-        Page pageExpected = processContentPage.getContentPageFirstPage(documentTC2, 9, ParagraphSeparator.ONE_JUMP);
+        var paragraphFormats = new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.ONE_JUMP);
+
+        Page pageExpected = processContentPage.getContentPageFirstPage(documentTC2, 9, paragraphFormats);
         assertEquals(paragraphsNoExpected, pageExpected.paragraphs().size());
     }
     

@@ -1,10 +1,6 @@
 package com.rafanegrette.books.controllers;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.rafanegrette.books.model.Book;
 import com.rafanegrette.books.port.out.SaveBookService;
@@ -22,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("books")
 public class SaveController {
 
-    private SaveBookService saveBookService;
+    private final SaveBookService saveBookService;
 
     @Autowired
     public SaveController(@Qualifier("SaveBookCoordinatorService") SaveBookService saveBookService) {

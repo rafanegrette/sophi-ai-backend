@@ -1,3 +1,6 @@
+spring:
+  thymeleaf:
+    mode: HTML
 app:
   file:
     path: /home/rafa/Project/sophi-storage/audios/
@@ -7,3 +10,8 @@ server:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE

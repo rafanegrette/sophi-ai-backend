@@ -12,7 +12,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
 	testImplementation platform('software.amazon.awssdk:bom:2.20.56')
 	testImplementation("software.amazon.awssdk:dynamodb-enhanced")
 }

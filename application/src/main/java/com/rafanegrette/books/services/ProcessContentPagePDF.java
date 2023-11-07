@@ -9,22 +9,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.rafanegrette.books.model.formats.ParagraphFormats;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
 
 import com.rafanegrette.books.model.Page;
 import com.rafanegrette.books.model.Paragraph;
-import com.rafanegrette.books.model.Paragraph.ParagraphSeparator;
 import com.rafanegrette.books.model.Sentence;
 import com.rafanegrette.books.string.formats.StringFormatFunctions;
 
+@Slf4j
 @Service
 public class ProcessContentPagePDF implements ContentPage {
 
@@ -32,7 +33,7 @@ public class ProcessContentPagePDF implements ContentPage {
     private static final String DAVID_CROSS = "✡";
     private static final int MAX_WORDS = 17;
     private static final int UMBLAL_MAX_WORDS = 5;
-    
+
     @Deprecated
     public LinkedList<Sentence> formatSentences(List<Sentence> sentences) {
 
@@ -108,8 +109,8 @@ public class ProcessContentPagePDF implements ContentPage {
      * @param sentence with title in uppercase
      * @return clean sentence
      */
-    public Page getContentPageFirstPage(PDDocument document, int noPage, 
-            ParagraphSeparator paragraphSeparator) throws IOException{
+    public Page getContentPageFirstPage(PDDocument document, int noPage,
+                                        ParagraphFormats paragraphFormats) throws IOException{
         Function<String,  String> fixTitleMixupFirstSentence = sentence -> {
             int idxTitleEnd = 0;
             for (char currentChar : sentence.toCharArray())
@@ -128,46 +129,57 @@ public class ProcessContentPagePDF implements ContentPage {
             }
             return "";
         };
-        return getContentPage(document, noPage, paragraphSeparator, fixTitleMixupFirstSentence);
+        return getContentPage(document, noPage, paragraphFormats, fixTitleMixupFirstSentence);
     }
     
-    public Page getContentPage(PDDocument document, int noPage, 
-            ParagraphSeparator paragraphSeparator) throws IOException {
+    public Page getContentPage(PDDocument document, int noPage,
+                               ParagraphFormats paragraphFormats) throws IOException {
 
         Function<String, String> fixTitleMixupFirstSentence = sentence -> sentence;
-        return getContentPage(document, noPage, paragraphSeparator, fixTitleMixupFirstSentence);
+        return getContentPage(document, noPage, paragraphFormats, fixTitleMixupFirstSentence);
     }
-    
-    public Page getContentPage(PDDocument document, int noPage, 
-            ParagraphSeparator separator,  Function<String, String> fixTitleMixupFirstSentenceHP2) throws IOException{
+
+
+    public Page getContentPage(PDDocument document, int noPage,
+                               ParagraphFormats paragraphFormats,  Function<String, String> fixTitleMixupFirstSentenceHP2) throws IOException{
         
         PDFTextStripper pdfStripper = new PDFTextStripper();
         pdfStripper.setStartPage(noPage);
         pdfStripper.setEndPage(noPage);
         StringWriter out = new StringWriter();
         PrintWriter writer = new PrintWriter(out);
+        pdfStripper.setAddMoreFormatting(paragraphFormats.applyExtraFormat());
+        pdfStripper.setSuppressDuplicateOverlappingText(false);
+        pdfStripper.setDropThreshold(paragraphFormats.paragraphThreshold().getThreshold());
         pdfStripper.writeText(document, writer);
+
         String rawPageText = fixTitleMixupFirstSentenceHP2.apply(out.toString());
         
-        String[] paragraphs = StringFormatFunctions.formatPages(rawPageText).split(separator.getSeparator());
-        
+
+        return new Page(noPage, getParagraphs(rawPageText, paragraphFormats));
+    }
+
+    List<Paragraph> getParagraphs(String rawPageText, ParagraphFormats paragraphFormats) {
+        String[] paragraphs = StringFormatFunctions.formatPages(rawPageText).split(paragraphFormats.paragraphSeparator().getSeparator());
+
         List<Paragraph> paragraphsFinal = new LinkedList<>();
-        
+
         for (int i = 0; i < paragraphs.length; i++) {
             if (paragraphs[i].isBlank()) continue;
-            
+
             LinkedList<Sentence> sentences = createSentencesFromString(paragraphs[i], new String[] {".", "—",";","?", ":", "(", ")", DAVID_CROSS} );
 
             sentences = formatSentences(sentences);
-            
+
             if (!sentences.isEmpty()) {
                 Paragraph paragrap = new Paragraph(i,sentences);
                 paragraphsFinal.add(paragrap);
             }
         }
-        return new Page(noPage, paragraphsFinal);
+
+        return paragraphsFinal;
     }
-    
+
     @Override
     public LinkedList<Sentence> createSentencesFromString(String sentencesStr, String[] breakerCharacterArray) {
 
