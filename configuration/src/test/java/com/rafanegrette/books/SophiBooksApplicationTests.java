@@ -21,7 +21,8 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 						"openai.model=whiper", 
 						"openai.responseformat=text",
 						"openai.language=en", 
-						"openai.temperature=0.8"})
+						"openai.temperature=0.8",
+						"frontend.url=http://localhost"})
 class SophiBooksApplicationTests {
 
 	@MockBean
