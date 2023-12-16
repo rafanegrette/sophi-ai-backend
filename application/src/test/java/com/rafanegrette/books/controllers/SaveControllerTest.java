@@ -49,7 +49,7 @@ public class SaveControllerTest {
     }
 
     @Test
-    void testSaveFaile() throws Exception {
+    void testSaveFailed() throws Exception {
         // Given
         Book book = BookMother.harryPotter1().build();
         // When

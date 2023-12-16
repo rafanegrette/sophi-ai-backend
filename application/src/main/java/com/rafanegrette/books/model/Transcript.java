@@ -1,5 +1,5 @@
 package com.rafanegrette.books.model;
 
-public record Transcript(String text) {
+public record Transcript(String result) {
 
 }

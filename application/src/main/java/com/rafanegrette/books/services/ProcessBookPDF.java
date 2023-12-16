@@ -54,6 +54,7 @@ public class ProcessBookPDF implements LoadPDFService {
         return outlines;
     }
 
+    // TODO Convert to Iterative, java doesn't work well on tail recursion
     private void fillContentIndexHierarchically(List<BookMarkPage> outlines, PDOutlineItem bookMark, int index) {
 
         if (bookMark.getTitle() != null && !bookMark.getTitle().isBlank()) {

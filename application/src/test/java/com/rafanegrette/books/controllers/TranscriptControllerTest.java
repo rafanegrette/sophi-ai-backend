@@ -1,9 +1,12 @@
 package com.rafanegrette.books.controllers;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.rafanegrette.books.services.VoiceMatchingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -13,9 +16,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.rafanegrette.books.port.out.SpeechToTextService;
-
-
 @WebMvcTest(TranscriptController.class)
 @WithMockUser
 class TranscriptControllerTest {
@@ -23,25 +23,33 @@ class TranscriptControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @MockBean(name = "WhisperService")
-    SpeechToTextService speechToTextService;
+    @MockBean
+    VoiceMatchingService voiceMatchingService;
 
     @Test
     void testTranscript() throws Exception {
 
         //given
+        var userText = "Transcript this test";
+
         var file = new MockMultipartFile("file",
                 "test.wav",
                 MediaType.APPLICATION_OCTET_STREAM_VALUE,
-                "HELLOW FUCK".getBytes());
+                userText.getBytes());
+
+        when(voiceMatchingService.process(file.getBytes(), userText)).thenReturn(userText);
+
         //when
-        var mvcResult = this.mockMvc.perform(
+        this.mockMvc.perform(
                         multipart("/transcript")
                                 .file(file)
-                                .with(csrf()))
+                                .param("sentence", userText)
+                                .with(csrf())
+                                .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk())
-                .andReturn();
+                .andExpect(jsonPath("$.result").value(userText));
         //then
+
     }
 
 }
