@@ -1,8 +1,6 @@
 package com.rafanegrette.books.services;
 
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,79 +24,85 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest(classes = {ProcessChapterPDF.class, ProcessContentPagePDF.class})
 public class ProcessChapterTest {
 
-	@Autowired
-	ProcessChapterPDF processChapterPDF;
-	
-    
+    @Autowired
+    ProcessChapterPDF processChapterPDF;
+
+
     @Test
     void testGetPagesWithSeparatorTC1() throws IOException {
         PDDocument document = getDocumentWithParagraph();
         var chapterTwo = getChapter(document, 2);
+        var contentIndex = new ContentIndex(2, "Chapter 2", 8, 12, 2);
         var formParameter = new FormParameter("Harry-1",
-        		new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP),
-        		ChapterTitleType.CONTENT,
-        		FirstPageOffset.TWO,
-        		false);
-        List<Page> pagesExpected = processChapterPDF.getPages(document, chapterTwo.outlineItem(), formParameter);
-        assertEquals("Page Title", pagesExpected.get(1).paragraphs().get(0).sentences().get(0).text());
+                new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP),
+                ChapterTitleType.CONTENT,
+                FirstPageOffset.TWO,
+                false);
+        List<Page> pagesExpected = processChapterPDF.getPages(document, contentIndex, formParameter);
+        assertEquals("Page Title 7", pagesExpected.get(1).paragraphs().get(0).sentences().get(0).text());
     }
 
 
     @Test
     void testGetRightChapterIdTC1() throws IOException {
         PDDocument document = getDocumentWithParagraph();
-        var chapterSix = getChapter(document, 6);
+        var contentIndexSix = new ContentIndex(6, "Chapter 6", 6 * 4, 6 * 4 + 4, 6);
         var formParameter = new FormParameter("Harry-1",
                 new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP),
-        		ChapterTitleType.CONTENT,
-        		FirstPageOffset.TWO,
-        		false);
-        Chapter chapterReturned = processChapterPDF.getChapter(document, chapterSix, formParameter);
+                ChapterTitleType.CONTENT,
+                FirstPageOffset.TWO,
+                false);
+        Chapter chapterReturned = processChapterPDF.getChapter(document, contentIndexSix, formParameter);
         assertEquals(6, chapterReturned.id());
     }
-    
-    /**TODO 
+
+    /**
+     * TODO
      * Fix this... looks horrible
+     *
      * @throws IOException
      */
     @Test
     void testGetPagesWithSeparatorTC2() throws IOException {
-    	int chapterNo = 7;
+        int chapterNo = 7;
         var formParameter = new FormParameter("Harry-2",
                 new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.ONE_JUMP),
-        		ChapterTitleType.BOOKMARK,
-        		FirstPageOffset.ONE,
-        		true);
+                ChapterTitleType.BOOKMARK,
+                FirstPageOffset.ONE,
+                true);
         PDDocument document = getDocumentWithFixTitleHP1();
-        var chapterSeven = getChapter(document, chapterNo);
-        List<Page> pagesExpected = processChapterPDF.getPages(document, chapterSeven.outlineItem(), formParameter);
-        assertEquals("PAGE TITLE  PROLOGE", 
-        		pagesExpected.get(0).paragraphs().get(0).sentences().get(0).text());
-        assertEquals("Prologe after title", 
-        		pagesExpected.get(0).paragraphs().get(1).sentences().get(0).text());
+        //File outputFile = new File("/home/rafa/Documents/test.pdf");
+        //document.save(outputFile);
+        var contentIndexSeven = new ContentIndex(7, "Chapter 2", 7 * 4 + 1, 7 * 4 + 6, 7);
+        List<Page> pagesExpected = processChapterPDF.getPages(document, contentIndexSeven, formParameter);
+        assertEquals("PAGE TITLE  PROLOGE",
+                pagesExpected.get(0).paragraphs().get(0).sentences().get(0).text());
+        assertEquals("Prologe after title",
+                pagesExpected.get(0).paragraphs().get(1).sentences().get(0).text());
     }
 
     @Test
-    void testGetChapterByIndexTC2() throws IOException
-    {
+    void testGetChapterByContentIndexTC2() throws IOException {
         var formParameter = new FormParameter("Harry-2",
                 new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.ONE_JUMP),
-        		ChapterTitleType.BOOKMARK,
-        		FirstPageOffset.ONE,
-        		true);
+                ChapterTitleType.BOOKMARK,
+                FirstPageOffset.ONE,
+                true);
         PDDocument document = getDocumentWithParagraph();
-        var chapterSix = getChapter(document, 6);
-        Chapter chapterReturned = processChapterPDF.getChapter(document, chapterSix, formParameter);
-        String titleExpected = "Page 6";
+        var contentIndexSix = new ContentIndex(6, "Chapter 6", 6 * 4, 6 * 4 + 4, 6);
+        Chapter chapterReturned = processChapterPDF.getChapter(document, contentIndexSix, formParameter);
+        String titleExpected = "Chapter 6";
         assertEquals(titleExpected, chapterReturned.title());
+        assertEquals(4, chapterReturned.pages().size());
     }
 
     @Test
-    void testGetContentChapter3TC3() throws IOException
-    {
+    void testGetContentEmptyPageShouldFail() throws IOException {
         //Path path = Paths.get("/home/rafa/Documents/books/english-fairy-tales.pdf");
         //byte[] bytesFile = Files.readAllBytes(path);
         var document = getDocumentWithoutPages();
@@ -108,10 +112,30 @@ public class ProcessChapterTest {
                 FirstPageOffset.ONE,
                 false);
         //PDDocument document = getDocumentFromByteFile(bytesFile, formParameter);
-        var chapterTwo = getChapter(document, 5);
-        Chapter chapterReturned = processChapterPDF.getChapter(document, chapterTwo, formParameter);
+        var contentIndexThree = new ContentIndex(2, "Chapter 2", null, null, 2);
 
-        assertEquals(0, chapterReturned.pages().size());
+        assertThrows(NotContentException.class, () ->
+                processChapterPDF.getChapter(document, contentIndexThree, formParameter));
+
+    }
+
+    @Test
+    void testRealBookDissable() throws IOException
+    {
+        Path path = Paths.get("/home/rafa/Documents/books/english-fairy-tales.pdf");
+        byte[] bytesFile = Files.readAllBytes(path);
+        var formParameter = new FormParameter("Harry-2",
+                new ParagraphFormats(ParagraphThreshold.THREE, true, ParagraphSeparator.TWO_JUMP),
+                ChapterTitleType.BOOKMARK,
+                FirstPageOffset.ONE,
+                false);
+        PDDocument document = getDocumentFromByteFile(bytesFile, formParameter);
+        var contentIndexThree = new ContentIndex(2, "Chapter 2", 3, 5, 2);
+
+        var chapterReturned = processChapterPDF.getChapter(document, contentIndexThree, formParameter);
+
+        assertNotNull(chapterReturned);
+
     }
 
     private PDDocument getDocumentFromByteFile(byte[] bookFile, FormParameter formParameter) throws IOException {
@@ -126,9 +150,10 @@ public class ProcessChapterTest {
                 ChapterTitleType.BOOKMARK,
                 FirstPageOffset.ONE,
                 true);
-        PDDocument document = getDocumentWithNestedBookMarks();
+        PDDocument document = BookPDFTest.getBookNestedBookmarksEmptyPages();
         var chapterZero = getChapter(document, 0);
-        Chapter chapterReturned = processChapterPDF.getChapter(document, chapterZero, formParameter);
+        var contentIndexThree = new ContentIndex(2, "Chapter 2", 0, 0, 2);
+        Chapter chapterReturned = processChapterPDF.getChapter(document, contentIndexThree, formParameter);
 
         assertEquals(0, chapterReturned.pages().size());
     }
@@ -141,9 +166,11 @@ public class ProcessChapterTest {
                 ChapterTitleType.BOOKMARK,
                 FirstPageOffset.ONE,
                 true);
-        PDDocument document = getDocumentWithNestedBookMarks();
-        var chapterOne = getChapter(document, 1);
-        Chapter chapterReturned = processChapterPDF.getChapter(document, chapterOne, formParameter);
+
+        PDDocument document = BookPDFTest.getBookNestedBookmarks();
+        var chapterOne = getChapter(document, 2);
+        var contentIndexOne = new ContentIndex(2, "Chapter 2", 4 * 2, 4 * 2 + 2, 2);
+        Chapter chapterReturned = processChapterPDF.getChapter(document, contentIndexOne, formParameter);
 
         assertEquals(2, chapterReturned.pages().size());
     }
@@ -168,55 +195,20 @@ public class ProcessChapterTest {
     private ProcessBookPDF.BookMarkPage getChapter(PDDocument document, int noChapter) {
         PDOutlineItem currentChapter = document.getDocumentCatalog().getDocumentOutline().getFirstChild();
         int i = 0;
-        if (currentChapter.hasChildren() && noChapter != i) {
+        while (currentChapter.hasChildren() && i < noChapter) {
             currentChapter = currentChapter.getFirstChild();
             i++;
         }
-        for (; i < noChapter; i++) {
+        while (i < noChapter ) {
+            i++;
             currentChapter = currentChapter.getNextSibling();
+            while (currentChapter.hasChildren() && i < noChapter) {
+                currentChapter = currentChapter.getFirstChild();
+                i++;
+            }
+
         }
         return new ProcessBookPDF.BookMarkPage(noChapter, currentChapter.getTitle(), currentChapter );
-    }
-
-
-    private PDDocument getDocumentWithNestedBookMarks() {
-
-        PDDocument document = new PDDocument();
-        PDDocumentOutline outline = new PDDocumentOutline();
-        document.getDocumentCatalog().setDocumentOutline(outline);
-
-        PDPage page1 = new PDPage();
-        document.addPage(page1);
-        PDPage page2 = new PDPage();
-        document.addPage(page2);
-        PDPage page3 = new PDPage();
-        document.addPage(page3);
-        PDPage page4 = new PDPage();
-        document.addPage(page4);
-
-        PDPageXYZDestination dest1 = new PDPageXYZDestination();
-        dest1.setPage(page1);
-
-        PDPageXYZDestination dest2 = new PDPageXYZDestination();
-        dest2.setPage(page3);
-
-        PDOutlineItem bookmark = new PDOutlineItem();
-        bookmark.setDestination(dest1);
-        bookmark.setTitle("BookMarkMain");
-
-        PDOutlineItem bookmark1 = new PDOutlineItem();
-        bookmark1.setDestination(dest1);
-        bookmark1.setTitle("Bookmark " + 1);
-        bookmark.addLast(bookmark1);
-
-        PDOutlineItem bookmark2 = new PDOutlineItem();
-        bookmark2.setDestination(dest2);
-        bookmark2.setTitle("Bookmark " + 2);
-        bookmark.addLast(bookmark2);
-
-        outline.addLast(bookmark);
-
-        return document;
     }
 
 
@@ -237,13 +229,13 @@ public class ProcessChapterTest {
             dest.setPage(page);
             PDOutlineItem bookmark = new PDOutlineItem();
             bookmark.setDestination(dest);
-            bookmark.setTitle("Page " + i);
+            bookmark.setTitle("Page " + (i *4));
             outline.addLast(bookmark);
 
-            for (int pageNo = 0; pageNo <= 3; pageNo ++) {
-                PDPage page1 = new PDPage(PDRectangle.A4);
-                setPageContent(document, page1);
-                document.addPage(page1);
+            for (int pageNo = 1; pageNo <= 3; pageNo ++) {
+                PDPage nextPage = new PDPage(PDRectangle.A4);
+                setPageContent(document, nextPage, i * 4 + pageNo);
+                document.addPage(nextPage);
             }
             
         }
@@ -265,19 +257,19 @@ public class ProcessChapterTest {
             contentStream.beginText();
             contentStream.newLineAtOffset(20, 700);
             contentStream.showText("PPAGE TITLE");
-            contentStream.newLineAtOffset(50, 700);
+            contentStream.newLineAtOffset(50, -15);
             contentStream.showText("PROLOGE");
-            contentStream.newLineAtOffset(50, 700);
+            contentStream.newLineAtOffset(50, -15);
             contentStream.showText("rologe after title.");
-            contentStream.newLineAtOffset(50, 700);
+            contentStream.newLineAtOffset(50, -15);
             contentStream.showText(" ");
-            contentStream.newLineAtOffset(20, 700);
+            contentStream.newLineAtOffset(20, -15);
             contentStream.showText(" ");
-            contentStream.newLineAtOffset(20, 700);
+            contentStream.newLineAtOffset(20, -15);
             contentStream.showText("Paragraph 1 text. Second sentence of the first Paragraph.");
-            contentStream.newLineAtOffset(0, 700);
+            contentStream.newLineAtOffset(0, -15);
             contentStream.showText(" ");
-            contentStream.newLineAtOffset(20, 700);
+            contentStream.newLineAtOffset(20, -15);
 
             contentStream.showText("          Paragraph Two text");
             contentStream.newLineAtOffset(0, -30);
@@ -297,9 +289,9 @@ public class ProcessChapterTest {
         document.getDocumentCatalog().setDocumentOutline(outline);
 
         for (int i = 0; i <= 17; i++) {
-        
+
             PDPage page = new PDPage(PDRectangle.A4);          
-            setPageContent(document, page);
+            setPageContent(document, page, i * 4);
             
             document.addPage(page);
 
@@ -310,9 +302,9 @@ public class ProcessChapterTest {
             bookmark.setTitle("Page " + i);
             outline.addLast(bookmark);
 
-            for (int pageNo = 0; pageNo <= 3; pageNo ++) {
+            for (int pageNo = 1; pageNo <= 4; pageNo ++) {
                 PDPage page1 = new PDPage(PDRectangle.A4);
-                setPageContent(document, page1);
+                setPageContent(document, page1, i * 4 + pageNo);
                 document.addPage(page1);
             }
             
@@ -328,24 +320,24 @@ public class ProcessChapterTest {
         return document;
     }
 
-    private void setPageContent(PDDocument document, PDPage page) {
+    private void setPageContent(PDDocument document, PDPage page, int pageNo) {
         try {
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
             contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
             contentStream.beginText();
             contentStream.newLineAtOffset(50, 700);
             contentStream.showText(" ");
-            contentStream.newLineAtOffset(20, 700);
+            contentStream.newLineAtOffset(20, -15);
             contentStream.showText(" ");
-            contentStream.newLineAtOffset(20, 700);
-            contentStream.showText("Page Title");
-            contentStream.newLineAtOffset(50, 700);
+            contentStream.newLineAtOffset(20, -15);
+            contentStream.showText("Page Title " + pageNo);
+            contentStream.newLineAtOffset(50, -15);
             contentStream.showText(" ");
-            contentStream.newLineAtOffset(20, 700);
+            contentStream.newLineAtOffset(20, -15);
             contentStream.showText("Paragraph 1 text. Second sentence of the first Paragraph.");
-            contentStream.newLineAtOffset(0, 700);
+            contentStream.newLineAtOffset(0, -15);
             contentStream.showText(" ");
-            contentStream.newLineAtOffset(20, 700);
+            contentStream.newLineAtOffset(20, -15);
 
             contentStream.showText("          Paragraph Two text");
             contentStream.newLineAtOffset(0, -30);

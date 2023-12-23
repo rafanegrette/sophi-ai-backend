@@ -6,18 +6,17 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.rafanegrette.books.model.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
 
-import com.rafanegrette.books.model.Chapter;
-import com.rafanegrette.books.model.Page;
-import com.rafanegrette.books.model.FirstPageOffset;
-import com.rafanegrette.books.model.FormParameter;
 import com.rafanegrette.books.string.formats.StringFormatFunctions;
 
+@Slf4j
 @Service
 public class ProcessChapterPDF {
 
@@ -27,29 +26,29 @@ public class ProcessChapterPDF {
         this.processContentPage = processContentPage;
     }
 
-    private StringWriter getContentFromChapter(PDDocument document, PDOutlineItem item) throws IOException {
+    private StringWriter getContentFromChapter(PDDocument document, ContentIndex contentIndex) throws IOException {
         StringWriter out;
         PDFTextStripper pdfStripper = new PDFTextStripper();
-        pdfStripper.setStartBookmark(item);
-        pdfStripper.setEndBookmark(item.getNextSibling());
+        pdfStripper.setStartPage(contentIndex.pageStart());
+        pdfStripper.setEndPage(contentIndex.pageEnd());
         out = new StringWriter();
         PrintWriter writer = new PrintWriter(out);
         pdfStripper.writeText(document, writer);
         return out;
     }
 
-    protected Chapter getChapter(PDDocument document, ProcessBookPDF.BookMarkPage bookMarkPage, FormParameter formParameter) throws IOException {
+    protected Chapter getChapter(PDDocument document, ContentIndex contentIndex, FormParameter formParameter) throws IOException {
 
-        List<Page> pages = getPages(document, bookMarkPage.outlineItem(), formParameter);
+        List<Page> pages = getPages(document, contentIndex, formParameter);
         String title;
 
         try {
-            StringWriter contentWriter = getContentFromChapter(document, bookMarkPage.outlineItem());
+            StringWriter contentWriter = getContentFromChapter(document, contentIndex);
             //
             switch (formParameter.bookMarkType()) {
 
             case BOOKMARK:
-                title = bookMarkPage.title();
+                title = contentIndex.title();
                 break;
             default:
                 title = getChapterTitle(StringFormatFunctions.formatTitles(contentWriter.toString()));
@@ -58,7 +57,7 @@ public class ProcessChapterPDF {
             title = "Default Content";
         }
 
-        return new Chapter(bookMarkPage.index(), title, pages);
+        return new Chapter(contentIndex.index(), title, pages);
     }
 
     private String getChapterTitle(String firstParagraph) {
@@ -72,13 +71,17 @@ public class ProcessChapterPDF {
         }
     }
 
-    List<Page> getPages(PDDocument document, PDOutlineItem outlineItem, FormParameter formParameter) throws IOException {
+    List<Page> getPages(PDDocument document, ContentIndex contentIndex, FormParameter formParameter) throws IOException {
         List<Page> pages = new ArrayList<>();
         Integer firstNoPage;
         Integer lastNoPage;
         try {
-            firstNoPage = findFirstPageInChapter(document, outlineItem, formParameter.firstPageOffset());
-            lastNoPage = findLastPageInChapter(document, outlineItem);
+            firstNoPage = contentIndex.pageStart();
+            lastNoPage = contentIndex.pageEnd();
+            if (firstNoPage == null || lastNoPage == null) {
+                log.error("No page start/ends found");
+                throw new NotContentException();
+            }
         } catch (NullPointerException e) {
             firstNoPage = 0;
             lastNoPage = document.getNumberOfPages();

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.List;
 
 import com.rafanegrette.books.model.*;
@@ -19,8 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.util.Base64Utils;
-
 
 @ExtendWith(MockitoExtension.class)
 class PreviewPDFBookTest {
@@ -36,13 +35,13 @@ class PreviewPDFBookTest {
     	String label = "Chapter 1";
         String title = "New adventures";
         String bookId = "Adventure-1";
-        List<ContentIndex> indexes = List.of(new ContentIndex(0, "Adventure 1"), 
-                new ContentIndex(1, "Adventure 2"), 
-                new ContentIndex(2, "Adventure 3"));
+        List<ContentIndex> indexes = List.of(new ContentIndex(0, "Adventure 1", 0,0, 0),
+                new ContentIndex(1, "Adventure 2", 0,0, 1),
+                new ContentIndex(2, "Adventure 3", 0,0, 2));
         Book book = new Book(bookId, title, label, indexes, null);
 
         String bookStr = Files.readString(Path.of("./src/test/resources/base64Test.txt"));
-        byte[] bookByte = Base64Utils.decodeFromString(bookStr);
+        byte[] bookByte = Base64.getDecoder().decode(bookStr);
         var uploadForm = new UploadForm(bookStr,
                 "fantasi",
                 "TWO",
@@ -72,13 +71,13 @@ class PreviewPDFBookTest {
         String label = "Chapter 1";
         String title = "New adventures";
         String bookId = "Adventure-1";
-        List<ContentIndex> indexes = List.of(new ContentIndex(0, "Adventure 1"),
-                new ContentIndex(1, "Adventure 2"),
-                new ContentIndex(2, "Adventure 3"));
+        List<ContentIndex> indexes = List.of(new ContentIndex(0, "Adventure 1", 0 ,0, 1),
+                new ContentIndex(1, "Adventure 2", 0 ,0, 2),
+                new ContentIndex(2, "Adventure 3", 0, 0, 3));
         Book book = new Book(bookId, title, label, indexes, null);
 
         String bookStr = Files.readString(Path.of("./src/test/resources/base64Test.txt"));
-        byte[] bookByte = Base64Utils.decodeFromString(bookStr);
+        byte[] bookByte = Base64.getDecoder().decode(bookStr);
         var uploadForm = new UploadForm(bookStr,
                 "fantasi",
                 "TWO",

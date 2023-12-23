@@ -6,8 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.springframework.stereotype.Service;
@@ -19,14 +22,12 @@ import com.rafanegrette.books.model.FormParameter;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ProcessBookPDF implements LoadPDFService {
 
     private final ProcessChapterPDF processChapterPDF;
+    private final ProcessBookmarksPDF processBookmarksPDF;
 
-    public ProcessBookPDF(ProcessChapterPDF processChapterPDF) {
-        this.processChapterPDF = processChapterPDF;
-    }
-    
     @Override
     public Book getBookFromByteFile(byte[] bookFile, FormParameter formParameter) throws IOException {
         Book book;
@@ -40,44 +41,12 @@ public class ProcessBookPDF implements LoadPDFService {
         return null;
     }
 
-    List<BookMarkPage> getOutline(PDDocument document) {
-        List<BookMarkPage> outlines = new ArrayList<>();
-        Optional<PDDocumentOutline> documentOutline = Optional.ofNullable(document.getDocumentCatalog().getDocumentOutline());
-        int index = 0;
-        PDOutlineItem bookMark = documentOutline.orElse(new PDDocumentOutline()).getFirstChild();
-
-        if (bookMark == null) {
-            outlines.add(new BookMarkPage(index, "content", new PDOutlineItem()));
-        } else {
-            fillContentIndexHierarchically(outlines, bookMark, index);
-        }
-        return outlines;
-    }
-
-    // TODO Convert to Iterative, java doesn't work well on tail recursion
-    private void fillContentIndexHierarchically(List<BookMarkPage> outlines, PDOutlineItem bookMark, int index) {
-
-        if (bookMark.getTitle() != null && !bookMark.getTitle().isBlank()) {
-            outlines.add(new BookMarkPage(index, bookMark.getTitle(), bookMark));
-            index++;
-        }
-
-
-        if (bookMark.hasChildren()) {
-            fillContentIndexHierarchically(outlines, bookMark.getFirstChild(), index);
-        }
-        if (bookMark.getNextSibling() != null) {
-            fillContentIndexHierarchically(outlines, bookMark.getNextSibling(), index);
-        }
-
-    }
-
     private Book getBook(PDDocument document, FormParameter formParameter) throws IOException {
-        List<BookMarkPage> bookMarks = getOutline(document);
+        List<ContentIndex> bookMarks = processBookmarksPDF.getBookmarks(document);
         String originalTitle = document.getDocumentInformation().getTitle();
         List<Chapter> chapters = new ArrayList<>();
-        for (BookMarkPage bookMarkPage: bookMarks) {
-            Chapter chapter = processChapterPDF.getChapter(document, bookMarkPage, formParameter);
+        for (ContentIndex contentIndex: bookMarks.stream().filter(content -> content.pageStart() != null).toList()) {
+            Chapter chapter = processChapterPDF.getChapter(document, contentIndex, formParameter);
             if (validTitle(chapter.title())) {
                 chapters.add(chapter);
             }
@@ -85,7 +54,7 @@ public class ProcessBookPDF implements LoadPDFService {
         Book book = new Book(formParameter.labelName(), 
         		originalTitle, 
         		formParameter.labelName(),
-        		bookMarks.stream().map(BookMarkPage::contentIndex).toList(),
+                bookMarks,
         		chapters);
         document.close();
         return book;
@@ -96,8 +65,5 @@ public class ProcessBookPDF implements LoadPDFService {
     }
     record BookMarkPage(int index, String title, PDOutlineItem outlineItem){
 
-        public ContentIndex contentIndex() {
-            return new ContentIndex(this.index, this.title);
-        }
     }
 }

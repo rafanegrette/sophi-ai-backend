@@ -1,12 +1,15 @@
 package com.rafanegrette.books.services;
 
 import com.rafanegrette.books.port.out.SpeechToTextService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 
 import static java.lang.Math.max;
+
+@Slf4j
 @Service
 public class VoiceMatchingService {
 
@@ -47,21 +50,26 @@ public class VoiceMatchingService {
         LinkedList<String> words = new LinkedList<>();
         int i = transcribedWords.length, j = originalWords.length;
 
-        while (i > 0 || j > 0) {
-            if (dp[i - 1][j] < dp[i][j] && dp[i][j - 1] < dp[i][j]) {
-                words.offer(originalWords[j - 1]);
-               i--;
-               j--;
+        try {
+            while (i > 0 || j > 0) {
+                if (dp[i - 1][j] < dp[i][j] && dp[i][j - 1] < dp[i][j]) {
+                    words.offer(originalWords[j - 1]);
+                    i--;
+                    j--;
+                }
+                if (j > 0 && dp[i][j - 1] == dp[i][j]) {  // is in original, not in translated
+                    words.offer("<mark>" + originalWords[j - 1] + "</mark>");
+                    j--;
+                }
+                if (i > 0 && dp[i - 1][j] == dp[i][j]) { //  is in translated, not in original
+                    words.offer("~~" + transcribedWords[i - 1].replace("\n","") + "~~");
+                    i--;
+                }
             }
-            if (j > 0 && dp[i][j - 1] == dp[i][j]) {  // is in original, not in translated
-                words.offer("<mark>" + originalWords[j - 1] + "</mark>");
-                j--;
-            }
-            if (i > 0 && dp[i - 1][j] == dp[i][j]) { //  is in translated, not in original
-                words.offer("~~" + transcribedWords[i - 1].replace("\n","") + "~~");
-                i--;
-            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            log.error("Error ArrayIndexOut, original: {}, transcribed: {}", originalWords, transcribedWords);
         }
+
 
         return words;
     }

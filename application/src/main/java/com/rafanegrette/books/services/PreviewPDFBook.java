@@ -1,13 +1,13 @@
 package com.rafanegrette.books.services;
 
 import java.io.IOException;
+import java.util.Base64;
 
 import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
 import com.rafanegrette.books.model.formats.ParagraphThreshold;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Base64Utils;
 
 @Service
 public class PreviewPDFBook implements PreviewBookService {
@@ -28,7 +28,7 @@ public class PreviewPDFBook implements PreviewBookService {
                 : ChapterTitleType.CONTENT;
 		var formParameter = getFormParameters(uploadForm, separator, chapterTitleType);
 
-		byte[] byteFile = Base64Utils.decodeFromString(uploadForm.file());
+		byte[] byteFile = Base64.getDecoder().decode(uploadForm.file());
 
         return pdfService.getBookFromByteFile(byteFile, formParameter);
     }

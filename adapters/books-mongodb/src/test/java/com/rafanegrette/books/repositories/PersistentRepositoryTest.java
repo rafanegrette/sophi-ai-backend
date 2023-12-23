@@ -44,7 +44,7 @@ class PersistentRepositoryTest {
     PersistentRepository bookRepository;
     
     Book harryBook = BookMother.harryPotter1()
-    		.contentTable(List.of(new ContentIndex(1, "Chapter1")))
+    		.contentTable(List.of(new ContentIndex(1, "Chapter1", 1 , 3, 1)))
     		.build();
     
     @BeforeAll
@@ -64,7 +64,7 @@ class PersistentRepositoryTest {
         bookRepository.save(harryBook);
         List<Book> books = new ArrayList<>();
         bookRepository.findAll().forEach(books::add);
-        assertTrue(books.size() > 0);
+        assertFalse(books.isEmpty());
     }
     
     @Test
@@ -73,7 +73,7 @@ class PersistentRepositoryTest {
         List<Book> books = new ArrayList<>();
         bookRepository.findAll().forEach(books::add);
         
-        assertTrue(books.get(0).chapters().get(1).pages().size() > 0);
+        assertFalse(books.get(0).chapters().get(1).pages().isEmpty());
     }
 
     @Test
