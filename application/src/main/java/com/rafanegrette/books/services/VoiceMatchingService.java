@@ -25,8 +25,8 @@ public class VoiceMatchingService {
     }
 
     private String getMatched(String originalText, String transcribed) {
-        String[] originalWords = originalText.split(" ");
-        String[] transcribedWords = transcribed.split(" ");
+        String[] originalWords = originalText.split(" +");
+        String[] transcribedWords = transcribed.split(" +");
         var rowDp = transcribedWords.length + 1;
         var colDp = originalWords.length + 1;
         int[][] dp = new int[rowDp][colDp];

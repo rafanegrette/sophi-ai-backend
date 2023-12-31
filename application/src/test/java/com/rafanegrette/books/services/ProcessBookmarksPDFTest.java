@@ -1,6 +1,7 @@
 package com.rafanegrette.books.services;
 
 import com.rafanegrette.books.model.ContentIndex;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,6 +62,8 @@ public class ProcessBookmarksPDFTest {
     @Test
     void testGetBookMarks() throws IOException {
         PDDocument document = BookPDFTest.getDocumentWith17BookMarks();
+        //File file = new File("/home/rafa/Documents/test.PDF");
+        //document.save(file);
         List<ContentIndex> result = processBookmarksPDF.getBookmarks(document);
         assertNotNull(result);
         assertEquals(17, result.size());
@@ -86,12 +89,23 @@ public class ProcessBookmarksPDFTest {
     @Test
     void test17SiblingBookmarks() throws IOException {
         var document = BookPDFTest.getDocumentWith17BookMarks();
-        File file = new File("/home/rafa/Documents/test17bookmarsk.pdf");
-        document.save(file);
+
         var result = processBookmarksPDF.getBookmarks(document);
 
         assertNotNull(result);
         assertNotNull(result.get(0).pageStart());
         assertEquals(17, result.get(16).pageEnd());
     }
+
+    @Test
+    void testTripleNestedOutline() throws IOException {
+        var document = BookPDFTest.getBookMultiNested();//
+        //File file = new File("/home/rafa/Documents/testmulti.PDF");
+        //document.save(file);
+        var result = processBookmarksPDF.getBookmarks(document);
+
+        assertNotNull(result);
+        assertEquals(9, result.size());
+    }
+
 }

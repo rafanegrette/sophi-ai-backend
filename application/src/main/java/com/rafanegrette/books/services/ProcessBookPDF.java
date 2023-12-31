@@ -4,14 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +28,8 @@ public class ProcessBookPDF implements LoadPDFService {
     @Override
     public Book getBookFromByteFile(byte[] bookFile, FormParameter formParameter) throws IOException {
         Book book;
-        try (PDDocument document = PDDocument.load(bookFile)) {
+
+        try (PDDocument document = Loader.loadPDF(bookFile)) {
             book = getBook(document, formParameter);
         }
         return book;

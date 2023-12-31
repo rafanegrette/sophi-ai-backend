@@ -3,6 +3,10 @@ package com.rafanegrette.books.services;
 import com.rafanegrette.books.model.ContentIndex;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
+import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDNamedDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
@@ -23,71 +27,87 @@ public class ProcessBookmarksPDF {
         if (bookMark == null) {
             outlines.add(new ContentIndex(index, "content", 0, bookPdf.getNumberOfPages() - 1, 1));
         } else {
-            fillContentIndexHierarchically(outlines, bookMark, index, bookPdf.getNumberOfPages());
+            fillContentIndexHierarchically(outlines, bookMark, index, bookPdf);
         }
         return outlines;
     }
 
-    private void fillContentIndexHierarchically(List<ContentIndex> outlines, PDOutlineItem bookMark, int index, int lastPageNo) throws IOException{
+    private void fillContentIndexHierarchically(List<ContentIndex> outlines, PDOutlineItem bookMark, int index, PDDocument bookPdf) throws IOException{
 
         ChapterId chapterId = new ChapterId();
-        TreeMap<Integer, Integer> startPageChapters = getStartPageChapters(bookMark, lastPageNo);
-        index = addOutline(outlines, bookMark, index, startPageChapters, chapterId);
+        TreeMap<Integer, Integer> startPageChapters = getStartPageChapters(bookMark, bookPdf);
 
-        while (bookMark.hasChildren() || bookMark.getNextSibling() != null) {
-            if (bookMark.hasChildren()) {
+        Stack<PDOutlineItem> parentsOutlines = new Stack<>();
 
-                index =  addOutline(outlines, bookMark.getFirstChild(), index, startPageChapters, chapterId);
+        do {
+
+            index = addOutline(outlines, bookMark, index, startPageChapters, chapterId, bookPdf);
+
+            while (bookMark.hasChildren()) {
+                index =  addOutline(outlines, bookMark.getFirstChild(), index, startPageChapters, chapterId, bookPdf);
+                parentsOutlines.add(bookMark);
                 bookMark = bookMark.getFirstChild();
             }
 
-            if (bookMark.getNextSibling() != null) {
-                index =  addOutline(outlines, bookMark.getNextSibling(), index, startPageChapters, chapterId);
-                bookMark = bookMark.getNextSibling();
+            bookMark = bookMark.getNextSibling();
+
+            while(bookMark == null && !parentsOutlines.isEmpty()) {
+                bookMark = parentsOutlines.pop().getNextSibling();
             }
-        }
+        } while (bookMark != null);
 
         log.info(startPageChapters.toString());
 
     }
 
-    private TreeMap<Integer, Integer> getStartPageChapters(PDOutlineItem bookMark, Integer lastPageNo) throws IOException {
+    private TreeMap<Integer, Integer> getStartPageChapters(PDOutlineItem bookMark, PDDocument bookPdf) throws IOException {
         TreeMap<Integer, Integer> pageChapters = new TreeMap<>();
 
-        var firstPageNo = getPageNumber(bookMark);
+        var firstPageNo = getPageNumber(bookMark, bookPdf);
         pageChapters.put(firstPageNo, null);
+        Stack<PDOutlineItem> parentsOutlines = new Stack<>();
 
-        while (bookMark.hasChildren() || bookMark.getNextSibling() != null) {
-            if (bookMark.hasChildren()) {
+        do {
+
+            while (bookMark.hasChildren()) {
+                parentsOutlines.add(bookMark);
                 bookMark = bookMark.getFirstChild();
-                var pageNo = getPageNumber(bookMark);
-                if (!pageChapters.isEmpty()) {
-                    pageChapters.compute(pageChapters.lastKey(), (k, v) -> pageNo);
-                }
-                pageChapters.put(pageNo, null);
+                var pageNo = getPageNumber(bookMark, bookPdf);
+                addPageToPageChapter(pageChapters, pageNo);
             }
 
-            if (bookMark.getNextSibling() != null) {
-                bookMark = bookMark.getNextSibling();
-                var pageNo = getPageNumber(bookMark);
-                if (!pageChapters.isEmpty()) {
-                    pageChapters.compute(pageChapters.lastKey(), (k, v) -> pageNo);
-                }
-                 pageChapters.put(pageNo, null);
+            bookMark = bookMark.getNextSibling();
+            var pageNo = getPageNumber(bookMark, bookPdf);
+            addPageToPageChapter(pageChapters, pageNo);
+
+            while(bookMark == null && !parentsOutlines.isEmpty()) {
+                bookMark = parentsOutlines.pop().getNextSibling();
             }
-        }
+
+        } while (bookMark != null);
+
         var lastKey = pageChapters.lastKey();
-        pageChapters.computeIfAbsent(lastKey, v -> lastPageNo);
+        pageChapters.computeIfAbsent(lastKey, v -> bookPdf.getNumberOfPages());
         return pageChapters;
+    }
+
+    private static void addPageToPageChapter(TreeMap<Integer, Integer> pageChapters, int pageNo) {
+        if (!pageChapters.isEmpty() && pageNo >= 0)  {
+            pageChapters.compute(pageChapters.lastKey(), (k, v) -> pageNo);
+        }
+        if (pageNo >= 0) {
+            pageChapters.put(pageNo, null);
+        }
     }
 
     private static int addOutline(List<ContentIndex> outlines,
                                   PDOutlineItem bookMark,
                                   int index, TreeMap<Integer,
                                   Integer> stackPage,
-                                  ChapterId chapterId) throws IOException {
+                                  ChapterId chapterId,
+                                  PDDocument bookPdf) throws IOException {
         if (bookMark.getTitle() != null && !bookMark.getTitle().isBlank()) {
-            var pageNumberStart = getPageNumber(bookMark);
+            var pageNumberStart = getPageNumber(bookMark, bookPdf);
             Integer startPage = null, endPage = null;
             if (stackPage.containsKey(pageNumberStart)) {
                 var pageIndex = stackPage.pollFirstEntry();
@@ -105,8 +125,21 @@ public class ProcessBookmarksPDF {
         return index;
     }
 
-    private static int getPageNumber(PDOutlineItem bookMark) throws IOException {
-        return ((PDPageDestination) bookMark.getDestination()).retrievePageNumber() + 1;
+    private static int getPageNumber(PDOutlineItem bookMark, PDDocument bookPdf) throws IOException {
+        if (bookMark == null) {
+            return -1;
+        }
+        var destination = bookMark.getDestination();
+        if (bookMark.getAction() instanceof PDActionGoTo destAction) {
+            destination = destAction.getDestination();
+        }
+
+        if (destination instanceof PDPageDestination pd) {
+            return pd.retrievePageNumber() + 1;
+        } else if (destination instanceof PDNamedDestination pdn && bookPdf.getDocumentCatalog().findNamedDestinationPage(pdn) != null) {
+            return bookPdf.getDocumentCatalog().findNamedDestinationPage(pdn).retrievePageNumber() + 1;
+        }
+        throw new NotContentException();
     }
 
     private static class ChapterId {

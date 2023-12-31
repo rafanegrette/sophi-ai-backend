@@ -11,15 +11,18 @@ import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
 import com.rafanegrette.books.model.formats.ParagraphThreshold;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,12 +64,6 @@ public class ProcessChapterTest {
         assertEquals(6, chapterReturned.id());
     }
 
-    /**
-     * TODO
-     * Fix this... looks horrible
-     *
-     * @throws IOException
-     */
     @Test
     void testGetPagesWithSeparatorTC2() throws IOException {
         int chapterNo = 7;
@@ -103,8 +100,6 @@ public class ProcessChapterTest {
 
     @Test
     void testGetContentEmptyPageShouldFail() throws IOException {
-        //Path path = Paths.get("/home/rafa/Documents/books/english-fairy-tales.pdf");
-        //byte[] bytesFile = Files.readAllBytes(path);
         var document = getDocumentWithoutPages();
         var formParameter = new FormParameter("Harry-2",
                 new ParagraphFormats(ParagraphThreshold.THREE, true, ParagraphSeparator.TWO_JUMP),
@@ -120,9 +115,10 @@ public class ProcessChapterTest {
     }
 
     @Test
+    @Disabled
     void testRealBookDissable() throws IOException
     {
-        Path path = Paths.get("/home/rafa/Documents/books/english-fairy-tales.pdf");
+        Path path = Paths.get("/home/rafa/Documents/books/mypdfbook.pdf");
         byte[] bytesFile = Files.readAllBytes(path);
         var formParameter = new FormParameter("Harry-2",
                 new ParagraphFormats(ParagraphThreshold.THREE, true, ParagraphSeparator.TWO_JUMP),
@@ -139,7 +135,7 @@ public class ProcessChapterTest {
     }
 
     private PDDocument getDocumentFromByteFile(byte[] bookFile, FormParameter formParameter) throws IOException {
-        return PDDocument.load(bookFile);
+        return Loader.loadPDF(bookFile);
     }
 
     @Test
@@ -151,7 +147,6 @@ public class ProcessChapterTest {
                 FirstPageOffset.ONE,
                 true);
         PDDocument document = BookPDFTest.getBookNestedBookmarksEmptyPages();
-        var chapterZero = getChapter(document, 0);
         var contentIndexThree = new ContentIndex(2, "Chapter 2", 0, 0, 2);
         Chapter chapterReturned = processChapterPDF.getChapter(document, contentIndexThree, formParameter);
 
@@ -253,7 +248,7 @@ public class ProcessChapterTest {
     private void setPageContentWithFixTitleHP1(PDDocument document, PDPage page) {
         try {
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
-            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN), 12);
             contentStream.beginText();
             contentStream.newLineAtOffset(20, 700);
             contentStream.showText("PPAGE TITLE");
@@ -323,7 +318,7 @@ public class ProcessChapterTest {
     private void setPageContent(PDDocument document, PDPage page, int pageNo) {
         try {
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
-            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN), 12);
             contentStream.beginText();
             contentStream.newLineAtOffset(50, 700);
             contentStream.showText(" ");

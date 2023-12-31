@@ -168,4 +168,22 @@ class VoiceMatchingServiceTest {
         // then
         assertEquals(expectedText, result);
     }
+
+
+    @Test
+    void testProcess() {
+        // given
+        var file = "Any binary, actually we don't need to test the format here".getBytes();
+        var originalText = "Dully, Harry turned  it over,";
+        var transcribedText = "Duely, he returned it over";
+        var expectedText = "~~Duely,~~ <mark>Dully,</mark> ~~he~~ <mark>Harry</mark> ~~returned~~ <mark>turned</mark> it over,";
+
+        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        // when
+        var result = voiceMatchingService.process(file, originalText);
+
+        // then
+        assertEquals(expectedText, result);
+    }
+
 }
