@@ -13,7 +13,6 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Profile("prod")
 @RestController
 public class UserController {
 
@@ -24,8 +23,11 @@ public class UserController {
     public User getUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         //var refreshToken = getRefreshToken(authentication);
-        var user = (OidcUser) authentication.getPrincipal();
-        return new User(user.getGivenName(), user.getEmail());
+        if (authentication.getPrincipal() instanceof OidcUser user) {
+            return new User(user.getGivenName(), user.getEmail());
+        }
+        return new User((String) authentication.getPrincipal(), "user@anonimous.com");
+
     }
 /*
     private OAuth2RefreshToken getRefreshToken(Authentication authentication) {
