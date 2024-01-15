@@ -18,3 +18,14 @@ spring:
         provider:
           google:
             authorizationUri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent
+        registration:
+          google:
+            scope:
+              - email
+              - profile
+              - openid
+#logging:
+#  level:
+#    org.springframework.security.oauth2: TRACE
+#    org.springframework.security: TRACE
+#    org.springframework.security.oauth2.client: TRACE

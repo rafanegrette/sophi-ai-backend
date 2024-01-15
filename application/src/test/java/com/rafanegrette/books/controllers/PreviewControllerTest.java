@@ -1,7 +1,7 @@
 package com.rafanegrette.books.controllers;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+//import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+//import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,9 +23,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.rafanegrette.books.model.Book;
 import com.rafanegrette.books.model.UploadForm;
 import com.rafanegrette.books.model.mother.BookMother;
-import com.rafanegrette.books.services.PreviewBookService;
+import com.rafanegrette.books.services.pdf.preview.PreviewBookService;
 
-@WithMockUser
+//@WithMockUser
 @WebMvcTest(PreviewController.class)
 class PreviewControllerTest {
 
@@ -57,7 +57,7 @@ class PreviewControllerTest {
 
         // Then
         this.mockMvc.perform(post("/books/preview")
-                        .with(csrf())
+                        //.with(csrf())
                         //.file(uploadPreview)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))

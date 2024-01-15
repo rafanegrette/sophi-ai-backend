@@ -25,7 +25,7 @@ class LoginControllerTest {
         MvcResult mvcResult = this.mockMvc.perform(get("/login")).andExpect(status().isOk()).andReturn();
         var response =mvcResult.getResponse().getContentAsString();
         // Then
-        assertTrue(response.contains("Please sign in"));
+        assertTrue(response.contains("Don't have an account?"));
     }
 
 }

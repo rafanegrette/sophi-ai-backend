@@ -1,4 +1,4 @@
-package com.rafanegrette.books.services;
+package com.rafanegrette.books.services.pdf.preview;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,9 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 
 import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.model.formats.ParagraphFormats;

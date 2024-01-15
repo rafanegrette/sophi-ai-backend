@@ -8,12 +8,25 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.client.*;
+import org.springframework.security.oauth2.client.endpoint.DefaultRefreshTokenTokenResponseClient;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Profile("prod")
 @RequiredArgsConstructor
@@ -21,6 +34,7 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final String X_CSRF_TOKEN = "X-XSRF-TOKEN";
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Value("${frontend.url}")
@@ -34,13 +48,15 @@ public class SecurityConfig {
                     auth.requestMatchers("resources/images/sophi-ai-logo.svg").permitAll();
                     auth.requestMatchers("resources/css/login.css").permitAll();
                     auth.requestMatchers("/actuator/health").permitAll();
+                    //auth.requestMatchers("/debug/token").permitAll();
+                    auth.requestMatchers("/login").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .oauth2Login(oath2 -> {
-                    oath2.loginPage("/login").permitAll();
-                    oath2.successHandler(oAuth2LoginSuccessHandler);
+                    oath2.loginPage("/login").defaultSuccessUrl(frontEndUrl);
                 })
-                .logout(oath2 -> oath2.logoutSuccessUrl(frontEndUrl))
+                .logout(oath2 -> oath2
+                        .logoutSuccessUrl(frontEndUrl))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }

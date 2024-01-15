@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,26 +32,22 @@ public class BookController {
     private Logger LOGGER = LoggerFactory.getLogger(BookController.class);
     private final ReadBookService readBookService;
 
-    @CrossOrigin
     @GetMapping("/{bookId}")
     public Book getBook(@PathVariable("bookId") String bookId) throws IOException {
         return this.readBookService.getBook(bookId).get();
     }
     
-    @CrossOrigin
     @GetMapping("/{bookId}/chapters/{chapterId}")
     public Chapter getChapter(@PathVariable("bookId") String bookId,
                                 @PathVariable("chapterId") int indexChapter) throws IOException {
         return this.readBookService.getChapter(bookId, indexChapter).get();
     }
 
-    @CrossOrigin
     @GetMapping("/titles")
     public List<Title> getAllTitles() {
         return this.readBookService.getAllTitles();
     }
     
-    @CrossOrigin
     @GetMapping("/{bookId}/chapters/{chapterId}/pages/{pageId}")
     public PageDTO getPage(@PathVariable("bookId") String bookId,
                         @PathVariable("chapterId") int indexChapter,

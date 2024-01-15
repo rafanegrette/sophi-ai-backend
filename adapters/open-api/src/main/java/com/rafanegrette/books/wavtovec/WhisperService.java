@@ -25,7 +25,7 @@ public class WhisperService implements SpeechToTextService {
 	private final OpenAIParams openAIParams;
 	private final String BEARER = "Bearer ";
 	
-	public WhisperService(@Qualifier("WebClientOpenAI") WebClient webClient, 
+	public WhisperService(@Qualifier("webClientOpenAI") WebClient webClient,
 							OpenAIParams params) {
 		this.webClientOpenAI = webClient;
 		this.openAIParams = params;

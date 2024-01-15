@@ -9,9 +9,16 @@ dependencies {
 	implementation project(':adapters:audio-files')
 	implementation project(':adapters:read-token')
 	implementation project(':adapters:open-api')
-	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web:'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation "io.springfox:springfox-boot-starter:3.0.0"
+	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+
+	testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.security:spring-security-oauth2-resource-server'
 	testImplementation platform('software.amazon.awssdk:bom:2.20.56')
 	testImplementation("software.amazon.awssdk:dynamodb-enhanced")
 }

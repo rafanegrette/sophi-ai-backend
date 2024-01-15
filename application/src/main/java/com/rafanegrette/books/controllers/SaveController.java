@@ -25,7 +25,6 @@ public class SaveController {
         this.saveBookService = saveBookService;
     }
 
-    @CrossOrigin
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> save(@RequestBody Book book) {
         try {

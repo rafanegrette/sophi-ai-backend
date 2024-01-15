@@ -19,7 +19,7 @@ public class OpenAIConfiguration {
 	private final OpenAIParams params;
 	
 	@Bean
-	@Qualifier("WebClientOpenAI")
+	@Qualifier("webClientOpenAI")
 	WebClient webClientOpenAI(WebClient.Builder builder) {
 		return WebClient.builder()
 				.baseUrl(params.getHost())

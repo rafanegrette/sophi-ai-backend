@@ -1,8 +1,13 @@
 package com.rafanegrette.books;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
@@ -22,11 +27,13 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 						"openai.responseformat=text",
 						"openai.language=en", 
 						"openai.temperature=0.8",
-						"frontend.url=http://localhost"})
+						"frontend.url=http://localhost",
+						"spring.security.oauth2.client.registration.google.client-id=dsjkhfjkds"})
 class SophiBooksApplicationTests {
 
 	@MockBean
 	DynamoDbClient dynamoDbClient;
+
 
 	@Test
 	void contextLoads() {

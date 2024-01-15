@@ -1,6 +1,5 @@
-package com.rafanegrette.books.services;
+package com.rafanegrette.books.services.pdf.preview;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +10,7 @@ import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
 import com.rafanegrette.books.model.formats.ParagraphThreshold;
+import com.rafanegrette.books.services.NotContentException;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;

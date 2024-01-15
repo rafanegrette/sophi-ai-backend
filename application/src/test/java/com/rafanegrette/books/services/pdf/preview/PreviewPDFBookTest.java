@@ -1,4 +1,4 @@
-package com.rafanegrette.books.services;
+package com.rafanegrette.books.services.pdf.preview;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;

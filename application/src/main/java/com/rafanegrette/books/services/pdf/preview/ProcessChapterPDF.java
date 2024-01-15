@@ -1,4 +1,4 @@
-package com.rafanegrette.books.services;
+package com.rafanegrette.books.services.pdf.preview;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.rafanegrette.books.model.*;
+import com.rafanegrette.books.services.NotContentException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;

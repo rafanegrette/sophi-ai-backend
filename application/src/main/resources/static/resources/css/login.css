@@ -58,6 +58,9 @@
     color: #615f5fdd;
 }
 
+.container .box .submessage {
+    font-size: 6px;
+}
 .box:active,
 .box:visited {
     border: 2px solid #646cff;

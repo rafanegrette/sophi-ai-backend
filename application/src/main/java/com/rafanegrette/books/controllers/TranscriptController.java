@@ -5,7 +5,6 @@ import java.io.IOException;
 import com.rafanegrette.books.services.VoiceMatchingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +24,7 @@ public class TranscriptController {
 		this.voiceMatchingService = voiceMatchingService;
 	}
 	
-	@CrossOrigin
+
 	@PostMapping(value = "/transcript")
 	public ResponseEntity<Transcript> transcript(
 								@RequestParam("file")
