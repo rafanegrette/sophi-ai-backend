@@ -6,4 +6,5 @@ public interface UserSecurityService {
 
     User getUser();
 
+    void saveUser();
 }

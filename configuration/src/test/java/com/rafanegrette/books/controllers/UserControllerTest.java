@@ -112,6 +112,5 @@ class UserControllerTest {
         this.mockMvc.perform(get("/user"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.user").value("Ralphy"));
-
     }
 }
