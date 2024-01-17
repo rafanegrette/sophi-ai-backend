@@ -16,3 +16,14 @@ dependencies {
 	testImplementation "com.github.tomakehurst:wiremock:3.0.0-beta-8"
 	
 }
+
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+tasks.withType(Test) {
+	// Ensure tests also use UTF-8, especially important for string comparisons
+	test {
+		systemProperty "file.encoding", "UTF-8"
+	}
+}
