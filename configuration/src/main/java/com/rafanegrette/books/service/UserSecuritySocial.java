@@ -17,14 +17,20 @@ public class UserSecuritySocial implements UserSecurityService {
     @Override
     public User getUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-        //var refreshToken = getRefreshToken(authentication);
+
         if (authentication.getPrincipal() instanceof DefaultOAuth2User user) {
             return new User(user.getAttribute("name"), user.getAttribute("email"));
+        } else if (authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User userDetail) {
+            return new User(userDetail.getUsername(), "user@anonimous.com");
         }
 
-        // DefaultOAuth2User -> attributes[Map<String,String>] (name, email)
         return new User(authentication.getPrincipal().toString(), "user@anonimous.com");
-
+        /* preview feature
+        return switch (authentication.getPrincipal()) {
+            case DefaultOAuth2User d -> new User(d.getAttribute("name"), d.getAttribute("email"));
+            case org.springframework.security.core.userdetails.User userDetail -> new User(userDetail.getUsername(), "user@anonimous.com");
+            default -> new User(authentication.getPrincipal().toString(), "user@anonimous.com");
+        };*/
     }
 
     @Override
