@@ -46,46 +46,56 @@ public class DynamoClient {
         		.build();
 		
         createBookTable(dynamoDbClient);
+		createUserTable(dynamoDbClient);
         return dynamoDbClient;
 	}
 
+	private void createUserTable(DynamoDbClient dynamoDbClient) {
+		createTable(dynamoDbClient, "User", "email");
+	}
+
+
 	private void createBookTable(DynamoDbClient dynamoDbClient) {
+		createTable(dynamoDbClient, "Book", "id");
+	}
+
+	private void createTable(DynamoDbClient dynamoDbClient, String tableName, String id) {
 		try {
-        	dynamoDbClient.describeTable(DescribeTableRequest.builder().tableName("Book").build());
-        } catch (ResourceNotFoundException e) {
-        	dynamoDbClient.createTable(CreateTableRequest.builder()
-        			.tableName("Book")
-        			.keySchema(KeySchemaElement.builder()
-        					.attributeName("id")
-        					.keyType(KeyType.HASH)
-        					.build())
-        			.attributeDefinitions(AttributeDefinition.builder()
-        					.attributeName("id")
-        					.attributeType(ScalarAttributeType.S)
-        					.build())
-        			.provisionedThroughput(ProvisionedThroughput.builder()
-        					.readCapacityUnits(5L)
-        					.writeCapacityUnits(5L)
-        					.build())
-        			.build());
-        	
-        	while(true) {
-        		try {
-        			Thread.sleep(1000);
-        		} catch(InterruptedException ie) {
-        			Thread.currentThread().interrupt();
-        			throw new RuntimeException("Interrup");
-        		}
-        		
-        		String tableStatus = dynamoDbClient
-        				.describeTable(DescribeTableRequest.builder()
-        				.tableName("Book").build())
-        				.table()
-        				.tableStatusAsString();
-        		if (tableStatus.equals(TableStatus.ACTIVE.toString())) {
-        			break;
-        		}
-        	}
-        }
+			dynamoDbClient.describeTable(DescribeTableRequest.builder().tableName(tableName).build());
+		} catch (ResourceNotFoundException e) {
+			dynamoDbClient.createTable(CreateTableRequest.builder()
+					.tableName(tableName)
+					.keySchema(KeySchemaElement.builder()
+							.attributeName(id)
+							.keyType(KeyType.HASH)
+							.build())
+					.attributeDefinitions(AttributeDefinition.builder()
+							.attributeName(id)
+							.attributeType(ScalarAttributeType.S)
+							.build())
+					.provisionedThroughput(ProvisionedThroughput.builder()
+							.readCapacityUnits(5L)
+							.writeCapacityUnits(5L)
+							.build())
+					.build());
+
+			while(true) {
+				try {
+					Thread.sleep(1000);
+				} catch(InterruptedException ie) {
+					Thread.currentThread().interrupt();
+					throw new RuntimeException("Interrup");
+				}
+
+				String tableStatus = dynamoDbClient
+						.describeTable(DescribeTableRequest.builder()
+								.tableName(tableName).build())
+						.table()
+						.tableStatusAsString();
+				if (tableStatus.equals(TableStatus.ACTIVE.toString())) {
+					break;
+				}
+			}
+		}
 	}
 }
