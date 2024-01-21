@@ -64,7 +64,9 @@ class BookControllerTest {
         Optional<Book> harryBook = Optional.of(new Book("UID-32432K", "Harry Potter and the Sorcerer's Stone", "Harry-1", null, null));
         //WHEN
         when(readBookService.getBook("Harry-1")).thenReturn(harryBook);
-        MvcResult mvcResult = this.mockMvc.perform(get("/books/{bookId}", "Harry-1")).andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/books/{bookId}", "Harry-1"))
+                .andExpect(status().isOk())
+                .andReturn();
         String jsonResponse = mvcResult.getResponse().getContentAsString();
         Book book = new ObjectMapper().readValue(jsonResponse, Book.class);
         assertEquals("Harry Potter and the Sorcerer's Stone", book.title());

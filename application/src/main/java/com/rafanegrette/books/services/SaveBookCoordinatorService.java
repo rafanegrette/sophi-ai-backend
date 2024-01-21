@@ -19,28 +19,34 @@ public class SaveBookCoordinatorService implements SaveBookService {
 
     private final SaveBookService saveBookDBService;
     private final SaveBookService saveBookAudioService;
+    private final SaveBookService saveBookWriteUserStateService;
 
     public SaveBookCoordinatorService(@Qualifier("SaveBookDBService")
-    					SaveBookService saveBookDBService, 
-    					@Qualifier("SaveBookAudioService")
-    					SaveBookService saveBookAudioService) {
-    	this.saveBookAudioService = saveBookAudioService;
-    	this.saveBookDBService = saveBookDBService;
-    	
+                                      SaveBookService saveBookDBService,
+                                      @Qualifier("SaveBookAudioService")
+                                      SaveBookService saveBookAudioService,
+                                      @Qualifier("SaveBookWriteUserStateService")
+                                      SaveBookService saveBookWriteUserStateService) {
+        this.saveBookAudioService = saveBookAudioService;
+        this.saveBookDBService = saveBookDBService;
+        this.saveBookWriteUserStateService = saveBookWriteUserStateService;
+
     }
+
     @Override
     public void save(Book book) {
-    	log.info("Entering coordinator save");
-    	
+        log.info("Entering coordinator save");
+
         var bookWithId = new Book(UUID.randomUUID().toString(),
-        book.title(),
-        book.label(),
-        book.contentTable(),
-        book.chapters());
-        
+                book.title(),
+                book.label(),
+                book.contentTable(),
+                book.chapters());
+
         saveBookDBService.save(bookWithId);
         saveBookAudioService.save(bookWithId);
+        saveBookWriteUserStateService.save(bookWithId);
         log.info("Saved book id: {}", bookWithId.id());
     }
-    
+
 }

@@ -47,6 +47,7 @@ public class DynamoClient {
 		
         createBookTable(dynamoDbClient);
 		createUserTable(dynamoDbClient);
+		createUserBookWriteStateTable(dynamoDbClient);
         return dynamoDbClient;
 	}
 
@@ -57,6 +58,10 @@ public class DynamoClient {
 
 	private void createBookTable(DynamoDbClient dynamoDbClient) {
 		createTable(dynamoDbClient, "Book", "id");
+	}
+
+	private void createUserBookWriteStateTable(DynamoDbClient dynamoDbClient) {
+		createTable(dynamoDbClient, "UserBookWriteState", "userEmail");
 	}
 
 	private void createTable(DynamoDbClient dynamoDbClient, String tableName, String id) {

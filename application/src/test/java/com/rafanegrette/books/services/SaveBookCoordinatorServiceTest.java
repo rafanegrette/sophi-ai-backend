@@ -23,12 +23,17 @@ class SaveBookCoordinatorServiceTest {
     SaveBookService saveBookDBService;
     @Mock(name = "SaveBookAudioService")
     SaveBookService saveBookAudioService;
+    @Mock(name = "SaveBookWriteUserStateService")
+    SaveBookService saveBookWriteUserStateService;
 
     SaveBookCoordinatorService coordinatorService;
 
     @BeforeEach
     void setUp() {
-        coordinatorService = new SaveBookCoordinatorService(saveBookDBService, saveBookAudioService);
+        coordinatorService = new SaveBookCoordinatorService(
+                saveBookDBService,
+                saveBookAudioService,
+                saveBookWriteUserStateService);
     }
 
     @Test
@@ -42,5 +47,6 @@ class SaveBookCoordinatorServiceTest {
         // Then
         verify(saveBookDBService, times(1)).save(any(Book.class));
         verify(saveBookAudioService, times(1)).save(any(Book.class));
+        verify(saveBookWriteUserStateService, times(1)).save(any(Book.class));
     }
 }
