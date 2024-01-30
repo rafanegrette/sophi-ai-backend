@@ -15,7 +15,8 @@ public class ChapterMother {
         		.id(0)
                 .title("The boy how lived")
                 .pages(List.of(PageMother.page1().build(),
-                        PageMother.page2().build()));
+                        PageMother.page2().build(),
+                        PageMother.page3().build()));
     }
     
     public static ChapterBuilder potterChapter2() {

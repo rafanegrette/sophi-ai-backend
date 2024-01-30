@@ -1,7 +1,7 @@
 package com.rafanegrette.books.repositories;
 
 import com.rafanegrette.books.model.BookWriteState;
-import com.rafanegrette.books.port.out.FindBookUserStateRepository;
+import com.rafanegrette.books.port.out.BookUserStateRepository;
 import com.rafanegrette.books.port.out.SaveBookUserStateRepository;
 import com.rafanegrette.books.repositories.entities.BookWriteStateDyna;
 import com.rafanegrette.books.repositories.entities.UserBookWriteStateDyna;
@@ -16,7 +16,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Repository
-public class BookUserStateDynamo implements SaveBookUserStateRepository, FindBookUserStateRepository {
+public class BookUserStateDynamo implements SaveBookUserStateRepository, BookUserStateRepository {
 
 
     private final DynamoDbTable<UserBookWriteStateDyna> bookUserStateTable;
@@ -29,6 +29,37 @@ public class BookUserStateDynamo implements SaveBookUserStateRepository, FindBoo
         var bookWriteStateDyna = BookWriteStateMapper.INSTANCE.map(bookWriteState);
         addBookWriteStateDyna(userWriteState, bookWriteStateDyna);
         bookUserStateTable.updateItem(r -> r.item(userWriteState));
+    }
+
+    @Override
+    public BookWriteState getState(String userId, String bookId) {
+
+        var userWriteState = getUserWriteState(userId);
+
+        return userWriteState.getBookWriteStateDynas()
+                .stream()
+                .filter(s -> s.getBookId().equals(bookId))
+                .map(BookWriteStateMapper.INSTANCE::map)
+                .findFirst()
+                .orElseThrow();
+    }
+
+    @Override
+    public void saveState(String userId, BookWriteState bookWriteState) {
+        var userWriteState = getUserWriteState(userId);
+        var bookWriteStateDyna = BookWriteStateMapper.INSTANCE.map(bookWriteState);
+        List<BookWriteStateDyna> newUserBookList = new ArrayList<>();
+        userWriteState.getBookWriteStateDynas()
+                .forEach(rb -> {
+                    if (rb.getBookId().equals(bookWriteState.bookId())) {
+                        newUserBookList.add(bookWriteStateDyna);
+                    } else {
+                        newUserBookList.add(rb);
+                    }
+                });
+
+        UserBookWriteStateDyna userBookWriteStateDyna = new UserBookWriteStateDyna(userId, newUserBookList);
+        bookUserStateTable.updateItem(r -> r.item(userBookWriteStateDyna));
     }
 
     private UserBookWriteStateDyna getUserWriteState(String userEmail) {
@@ -50,16 +81,5 @@ public class BookUserStateDynamo implements SaveBookUserStateRepository, FindBoo
         userBookWriteStateDyna.getBookWriteStateDynas().add(bookWriteStateDyna);
     }
 
-    @Override
-    public BookWriteState getState(String userId, String bookId) {
 
-        var userWriteState = getUserWriteState(userId);
-
-        return userWriteState.getBookWriteStateDynas()
-                .stream()
-                .filter(s -> s.getBookId().equals(bookId))
-                .map(BookWriteStateMapper.INSTANCE::map)
-                .findFirst()
-                .orElseThrow();
-    }
 }

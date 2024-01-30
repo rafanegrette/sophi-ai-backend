@@ -19,9 +19,10 @@ public class ParagraphMother {
     public static ParagraphBuilder paragraph2() {
         return paragraph2.id(2).sentences(List.of(new Sentence(0, "This is another boring story")));
     }
-    
+
     public static ParagraphBuilder paragraph3() {
-        return paragraph3.id(3).sentences(List.of(new Sentence(0, "This is the third boring story")));
+        return paragraph3.id(3).sentences(List.of(new Sentence(0, "This is the third boring story"),
+                new Sentence(1, "This is the next sentence")));
     }
     
     public static ParagraphBuilder paragraph4() {

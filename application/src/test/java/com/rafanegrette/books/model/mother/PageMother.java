@@ -23,7 +23,9 @@ public class PageMother {
     
     public static PageBuilder page3() {
         return page3.noPage(3).paragraphs(List.of(ParagraphMother.paragraph1().build(),
-                        ParagraphMother.paragraph2().build()));
+                        ParagraphMother.paragraph2().build(),
+                        ParagraphMother.paragraph3().build()
+                ));
     }
     
     public static class PageBuilder {

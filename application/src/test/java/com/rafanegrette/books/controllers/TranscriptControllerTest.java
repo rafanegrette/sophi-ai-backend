@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.rafanegrette.books.services.VoiceMatchingService;
+import com.rafanegrette.books.services.VoiceMatchingPhrases;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,7 +24,7 @@ class TranscriptControllerTest {
     MockMvc mockMvc;
 
     @MockBean
-    VoiceMatchingService voiceMatchingService;
+    VoiceMatchingPhrases voiceMatchingService;
 
     @Test
     void testTranscript() throws Exception {

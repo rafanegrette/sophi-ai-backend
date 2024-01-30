@@ -2,7 +2,7 @@ package com.rafanegrette.books.controllers;
 
 import java.io.IOException;
 
-import com.rafanegrette.books.services.VoiceMatchingService;
+import com.rafanegrette.books.services.VoiceMatchingPhrases;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,9 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class TranscriptController {
 
-	private final VoiceMatchingService voiceMatchingService;
+	private final VoiceMatchingPhrases voiceMatchingService;
 	
-	public TranscriptController(VoiceMatchingService voiceMatchingService) {
+	public TranscriptController(VoiceMatchingPhrases voiceMatchingService) {
 		this.voiceMatchingService = voiceMatchingService;
 	}
 	

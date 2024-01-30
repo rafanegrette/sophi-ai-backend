@@ -84,4 +84,14 @@ class BookUserStateDynamoTest {
         assertEquals(1, bookWriteState.paragraphId());
         assertEquals(1, bookWriteState.sentenceId());
     }
+
+    @Test
+    void saveBookWriteState() {
+        var userId = "fulano@gmail.com";
+        var bookId = "dskljkhjfkhv7dsf";
+        BookWriteState bookWriteState = new BookWriteState(bookId, 0, 0,1,1);
+        bookUserStateDynamo.saveState(userId, bookWriteState);
+
+        verify(bookUserStateTable).updateItem(any(Consumer.class));
+    }
 }
