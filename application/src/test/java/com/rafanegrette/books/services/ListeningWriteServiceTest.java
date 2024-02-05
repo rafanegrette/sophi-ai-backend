@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,7 +52,7 @@ class ListeningWriteServiceTest {
         // Then
         assertNotNull(response);
         assertFalse(response.accepted());
-        assertEquals("This is a ~~b~~~~e~~autiful very good test", response.result());
+        assertEquals("This is a <del>b</del><del>e</del>autiful very good test", response.result());
     }
 
 
@@ -70,6 +69,61 @@ class ListeningWriteServiceTest {
         // Then
         assertNotNull(response);
         assertFalse(response.accepted());
-        assertEquals("d~~u~~<mark>o</mark>meds wet in the very", response.result());
+        assertEquals("d<del>u</del><mark>o</mark>meds wet in the very", response.result());
+    }
+
+    @Test
+    void updateStatusMatchLatinDoubleQuoteSuccess() {
+        // Given
+        var userText = "She said morning";
+        var bookText = "she said “Morning“";
+        var bookId = BookMother.harryPotter1().build().id();
+        var userEmail = "ethusertest@gmail.com";
+        var request = new ListeningSentenceRequest(bookId, userText, bookText);
+        // When
+        var response = listeningWriteService.updateStatus(userEmail, request);
+        // Then
+        assertNotNull(response);
+        assertTrue(response.accepted());
+        assertEquals("she said Morning", response.result());
+    }
+
+    @Test
+    void updateStatusMissMatchUserAdditionalSpace() {
+        // Given
+        var userText = "any one";
+        var bookText = "anyone";
+        var bookId = BookMother.harryPotter1().build().id();
+        var userEmail = "ethusertest@gmail.com";
+        var request = new ListeningSentenceRequest(bookId, userText, bookText);
+
+        // When
+        var response = listeningWriteService.updateStatus(userEmail, request);
+
+        // Then
+
+        assertNotNull(response);
+        assertFalse(response.accepted());
+        assertEquals("any<del>[ ]</del>one", response.result());
+    }
+
+
+    @Test
+    void updateStatusMatchWeirdo() {
+        // Given
+        var userText = "it's bran";
+        var bookText = "its bran";
+        var bookId = BookMother.harryPotter1().build().id();
+        var userEmail = "ethusertest@gmail.com";
+        var request = new ListeningSentenceRequest(bookId, userText, bookText);
+
+        // When
+        var response = listeningWriteService.updateStatus(userEmail, request);
+
+        // Then
+
+        assertNotNull(response);
+        assertFalse(response.accepted());
+        assertEquals("it<del>'</del>s bran", response.result());
     }
 }

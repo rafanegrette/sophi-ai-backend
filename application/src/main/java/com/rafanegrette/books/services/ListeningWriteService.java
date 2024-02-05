@@ -22,7 +22,7 @@ public class ListeningWriteService extends DynamicMatchingPhrases<Character> {
         var userArray = strToCharacterArray(listeningSentenceRequest.userText());
         var matchedText = getMatched(originalArray, userArray);
 
-        if (listeningSentenceRequest.userText().equals(matchedText)) {
+        if (listeningSentenceRequest.userText().equalsIgnoreCase((matchedText))) {
             bookUserStateService.increaseState(listeningSentenceRequest.bookId());
             return new ListeningSentenceResponse(true, matchedText);
         }
@@ -51,20 +51,22 @@ public class ListeningWriteService extends DynamicMatchingPhrases<Character> {
 
         try {
             while (i > 0 || j > 0) {
-                if (dp[i - 1][j] < dp[i][j] && dp[i][j - 1] < dp[i][j]) {
+                if (dp[i - 1][j] < dp[i][j] && dp[i][j - 1] < dp[i][j]) { // Equals
                     words.offer(originalWords[j - 1].toString());
                     i--;
                     j--;
                 }
-                if (j > 0 && dp[i][j - 1] == dp[i][j]) {  // is in original, not in translated
-                    if (!Character.isSpaceChar(originalWords[j - 1])) {
+                if (j > 0 && dp[i][j - 1] == dp[i][j]) {  // is in book, not in userInput
+                    if (!isPunctuation(originalWords[j - 1])) {
                         words.offer("<mark>" + originalWords[j - 1] + "</mark>");
                     }
                     j--;
                 }
-                if (i > 0 && dp[i - 1][j] == dp[i][j]) { //  is in translated, not in original
-                    if (!Character.isSpaceChar(userWords[i - 1])) {
-                        words.offer("~~" + userWords[i - 1] + "~~");
+                if (i > 0 && dp[i - 1][j] == dp[i][j]) { //  is in userInput, not in book
+                    if (Character.isSpaceChar(userWords[i - 1])) {
+                        words.offer("<del>[ ]</del>");
+                    } else {
+                        words.offer("<del>" + userWords[i - 1] + "</del>");
                     }
                     i--;
                 }
@@ -78,7 +80,7 @@ public class ListeningWriteService extends DynamicMatchingPhrases<Character> {
         int N = words.size();
         for (int k = 0; k < N; k++) {
             var elem = words.pollLast();
-            if (elem != null && (elem.startsWith("~~") || elem.startsWith("<mark>"))) {
+            if (elem != null && (elem.startsWith("<del>") || elem.startsWith("<mark>"))) {
                 helps++;
             }
             if (helps > 2) {
