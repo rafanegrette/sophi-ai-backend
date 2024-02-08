@@ -109,7 +109,7 @@ class ListeningWriteServiceTest {
 
 
     @Test
-    void updateStatusMatchWeirdo() {
+    void updateStatusMissMatchApostropheRemove() {
         // Given
         var userText = "it's bran";
         var bookText = "its bran";
@@ -125,5 +125,24 @@ class ListeningWriteServiceTest {
         assertNotNull(response);
         assertFalse(response.accepted());
         assertEquals("it<del>'</del>s bran", response.result());
+    }
+
+    @Test
+    void updateStatusMissMatchApostropheAdd() {
+        // Given
+        var userText = "its bran";
+        var bookText = "it's bran";
+        var bookId = BookMother.harryPotter1().build().id();
+        var userEmail = "ethusertest@gmail.com";
+        var request = new ListeningSentenceRequest(bookId, userText, bookText);
+
+        // When
+        var response = listeningWriteService.updateStatus(userEmail, request);
+
+        // Then
+
+        assertNotNull(response);
+        assertFalse(response.accepted());
+        assertEquals("it<mark>'</mark>s bran", response.result());
     }
 }

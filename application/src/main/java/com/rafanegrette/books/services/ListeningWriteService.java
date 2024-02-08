@@ -57,7 +57,7 @@ public class ListeningWriteService extends DynamicMatchingPhrases<Character> {
                     j--;
                 }
                 if (j > 0 && dp[i][j - 1] == dp[i][j]) {  // is in book, not in userInput
-                    if (!isPunctuation(originalWords[j - 1])) {
+                    if (originalWords[j - 1] == '\'' || !isPunctuation(originalWords[j - 1])) {
                         words.offer("<mark>" + originalWords[j - 1] + "</mark>");
                     }
                     j--;
