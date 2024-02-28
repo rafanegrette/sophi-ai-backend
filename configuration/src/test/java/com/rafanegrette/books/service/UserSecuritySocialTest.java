@@ -1,6 +1,7 @@
 package com.rafanegrette.books.service;
 
 import com.rafanegrette.books.model.User;
+import com.rafanegrette.books.npl.config.ModelSegmentSentence;
 import com.rafanegrette.books.services.CreateUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ class UserSecuritySocialTest {
 
     @MockBean(name ="webClientOpenAI")
     WebClient webClient;
+
+    @MockBean
+    ModelSegmentSentence modelSegmentSentence;
 
     @Test
     void saveUser() {

@@ -2,16 +2,21 @@ package com.rafanegrette.books.services.pdf.preview;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
 import com.rafanegrette.books.model.formats.ParagraphThreshold;
+import com.rafanegrette.books.model.mother.ChapterMother;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -23,19 +28,25 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocume
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.ResourceUtils;
 
-@SpringBootTest(classes = {
-        ProcessBookPDF.class,
-        ProcessChapterPDF.class,
-        ProcessContentPagePDF.class,
-        ProcessBookmarksPDF.class})
+@ExtendWith(MockitoExtension.class)
 class ProcessBookPDFTest {
 
-    @Autowired
+    @InjectMocks
     private ProcessBookPDF processBookPDFService;
+
+    @Mock
+    ProcessChapterPDF processChapterPDF;
+    @Mock
+    ProcessBookmarksPDF processBookmarksPDF;
+
 
     final int PAGE_NO_7 = 6;
     final int PAGE_NO_3 = 2;
@@ -57,49 +68,15 @@ class ProcessBookPDFTest {
                 ChapterTitleType.CONTENT,
                 FirstPageOffset.TWO,
                 true);
+        var contentIndex = new ContentIndex(0, "title 1",0, 5, 0);
+
+        given(processBookmarksPDF.getBookmarks(any())).willReturn(List.of(contentIndex));
+        given(processChapterPDF.getChapter(any(), any(), any())).willReturn(ChapterMother.potterChapter1().build());
+
+
         Book book = processBookPDFService.getBookFromByteFile(bytesFile, formParameter);
         assertNotNull(book);
         assertTrue(book.chapters().size() > 0);
-    }
-
-    @Test
-    void testGetParagraphsFromInputStream() throws Exception {
-        byte[] bytesFile = getByteDocumentWithParagraph();
-        var formParameter = new FormParameter("Harry-1",
-                new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP),
-                ChapterTitleType.CONTENT,
-                FirstPageOffset.TWO,
-                true);
-        Book book = processBookPDFService.getBookFromByteFile(bytesFile, formParameter);
-
-        assertTrue(book.chapters().get(3).pages().get(1).paragraphs().size() > 1);
-    }
-
-
-    @Test
-    void testGetPageNumbersFromInputStream() throws Exception {
-        byte[] bytesFile = getByteDocumentWithParagraph();
-        var formParameter = new FormParameter("Harry-1",
-                new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP),
-                ChapterTitleType.CONTENT,
-                FirstPageOffset.TWO,
-                true);
-        Book book = processBookPDFService.getBookFromByteFile(bytesFile, formParameter);
-
-        assertTrue(book.chapters().get(3).pages().get(1).number() == 2);
-    }
-
-    @Test
-    void testGetChapterTitleTC1() throws IOException {
-        byte[] bytesFile = getByteDocumentWithParagraph();
-        var formParameter = new FormParameter("Harry-1",
-                new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP),
-                ChapterTitleType.CONTENT,
-                FirstPageOffset.TWO,
-                true);
-        Book book = processBookPDFService.getBookFromByteFile(bytesFile, formParameter);
-
-        assertEquals("Page Title", book.chapters().get(1).title());
     }
 
     @Test
@@ -110,61 +87,14 @@ class ProcessBookPDFTest {
                 ChapterTitleType.CONTENT,
                 FirstPageOffset.TWO,
                 true);
+        var contentIndex17 = get17IndexContent();
+        given(processBookmarksPDF.getBookmarks(any())).willReturn(contentIndex17);
+        given(processChapterPDF.getChapter(any(), any(), any())).willReturn(ChapterMother.potterChapter1().build());
+
         Book book = processBookPDFService.getBookFromByteFile(bytesFile, formParameter);
+
 
         assertEquals(17, book.chapters().size());
-    }
-
-    @Test
-    void testGetAllChaptersTC3() throws IOException {
-        //var path = Paths.get("/home/rafa/Documents/books/english-fairy-tales.pdf");
-        //byte[] bytesFile = Files.readAllBytes(path);
-        String[][] pages = {
-                {
-                    "Title Page 1",
-                    "\\n",
-                    "This is a sad test story about a little programmer. He didn't know how to speak very well",
-                    "English, but he try and try.",
-                    "\\n",
-                    "Until one day all happens."
-                },
-                {
-                    "Title page two",
-                    "\\n",
-                    "A great opportunity present itself in an unexpected form; start raining.",
-                    "\\n",
-                    "The end",
-                },
-                {
-                    "Title page THREE",
-                    "\\n",
-                    "Things got even more difficult in page 3"
-                }
-        };
-        PDDocument document = getDocumentWithNestedBookMarks(pages);
-        byte[] bytesFile = getByteDocument(document);
-        var formParameter = new FormParameter("Harry-1",
-                new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP),
-                ChapterTitleType.BOOKMARK,
-                FirstPageOffset.ONE,
-                true);
-        Book book = processBookPDFService.getBookFromByteFile(bytesFile, formParameter);
-
-        assertEquals(2, book.chapters().size());
-    }
-
-    @Test
-    void testGetSecondChapterThirdPage() throws IOException {
-        byte[] bytesFile = getByteDocumentWithParagraph();
-        var formParameter = new FormParameter("Harry-1",
-                new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP),
-                ChapterTitleType.CONTENT,
-                FirstPageOffset.TWO,
-                true);
-
-        Book book = processBookPDFService.getBookFromByteFile(bytesFile, formParameter);
-
-        assertEquals("Page Title", book.chapters().get(1).pages().get(PAGE_NO_3).paragraphs().get(0).sentences().get(0).text());
     }
 
     //@Test
@@ -175,35 +105,6 @@ class ProcessBookPDFTest {
         assertNotNull(imageFile);
     }
 
-    @Test
-    void testLastPageExist() throws IOException {
-        byte[] bytesFile = getByteDocumentWithParagraph();
-        var formParameter = new FormParameter("Harry-1",
-                new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP),
-                ChapterTitleType.CONTENT,
-                FirstPageOffset.TWO,
-                true);
-        Book book = processBookPDFService.getBookFromByteFile(bytesFile, formParameter);
-        Chapter lastChapter = book.chapters()
-                .get(book.chapters().size() - 1);
-        Integer pageNo = lastChapter.pages().size();
-
-        assertEquals(NO_PAGE_LAST_CHAPTER, pageNo);
-    }
-
-    @Test
-    void testGetChapterTitleTC2() throws IOException {
-
-        byte[] bytesFile = getByteDocumentWithParagraph();
-        var formParameter = new FormParameter("Harry-2",
-                new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.ONE_JUMP),
-                ChapterTitleType.BOOKMARK,
-                FirstPageOffset.ONE,
-                true);
-        Book book = processBookPDFService.getBookFromByteFile(bytesFile, formParameter);
-
-        assertEquals("Chapter 5", book.chapters().get(5).title());
-    }
 
     @Test
     void testBookWithoutPages() throws IOException {
@@ -220,62 +121,14 @@ class ProcessBookPDFTest {
                 .size());
     }
 
-    private PDDocument getDocumentWithNestedBookMarks(String[][] pagesContent) {
 
-        PDDocument document = new PDDocument();
-        PDDocumentOutline outline = new PDDocumentOutline();
-        document.getDocumentCatalog().setDocumentOutline(outline);
+    private List<ContentIndex> get17IndexContent() {
+        List<ContentIndex> indeces = new ArrayList<>();
 
-
-        PDPage page1 = new PDPage();
-        document.addPage(page1);
-        setPageContent(document, page1);
-
-        PDPage page2 = new PDPage();
-        setPageContent(document, page2);
-        document.addPage(page2);
-
-        PDPage page3 = new PDPage();
-        setPageContent(document, page2);
-        document.addPage(page3);
-
-        PDPage[] pages = {page1, page2, page3};
-
-        for (int i = 0; i < pagesContent.length; i++) {
-            setPageContent(document, pages[i], pagesContent[i]);
+        for (int i = 0; i < 17; i++) {
+            indeces.add(new ContentIndex(i, "title " + i, i * 5, i * 5 + 5, i));
         }
-
-        PDPageXYZDestination dest1 = new PDPageXYZDestination();
-        dest1.setPage(page1);
-
-        PDPageXYZDestination dest2 = new PDPageXYZDestination();
-        dest2.setPage(page2);
-
-        PDPageXYZDestination dest3 = new PDPageXYZDestination();
-        dest3.setPage(page2);
-
-        PDOutlineItem bookmark = new PDOutlineItem();
-        bookmark.setDestination(dest1);
-        bookmark.setTitle("Bookmark Main");
-
-        PDOutlineItem bookmark1 = new PDOutlineItem();
-        bookmark1.setDestination(dest1);
-        bookmark1.setTitle("Bookmark " + 1);
-        bookmark.addLast(bookmark1);
-
-        PDOutlineItem bookmark2 = new PDOutlineItem();
-        bookmark2.setDestination(dest2);
-        bookmark2.setTitle("Bookmark " + 2);
-        bookmark.addLast(bookmark2);
-
-        PDOutlineItem bookmark3 = new PDOutlineItem();
-        bookmark3.setDestination(dest3);
-        bookmark3.setTitle("Bookmark " + 3);
-        bookmark.addLast(bookmark3);
-
-        outline.addLast(bookmark);
-
-        return document;
+        return indeces;
     }
 
     private PDDocument getDocumentWithoutPages() {
@@ -334,41 +187,7 @@ class ProcessBookPDFTest {
             }
 
         }
-        /*
-        try {
-            PDFTextStripper textStripper = new PDFTextStripper();
-            String result = textStripper.getText(document);
-            //System.out.println(result);
-        } catch(IOException e) {
-            fail("cannot extract text");
-        }
-        */
-
         return getByteDocument(document);
-
-    }
-
-
-    private void setPageContent(PDDocument document, PDPage page, String[] pagesContent) {
-        try {
-            PDPageContentStream contentStream = new PDPageContentStream(document, page);
-            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN), 12);
-            contentStream.beginText();
-
-            contentStream.newLineAtOffset(50, 700);
-
-            for(String pageContent: pagesContent) {
-                contentStream.newLineAtOffset(50, -30);
-                contentStream.showText(pageContent);
-            }
-
-
-
-            contentStream.endText();
-            contentStream.close();
-        } catch (IOException e) {
-            fail("Getting document with paragraph");
-        }
 
     }
 

@@ -3,6 +3,7 @@ package com.rafanegrette.books.controllers;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.rafanegrette.books.npl.config.ModelSegmentSentence;
 import com.rafanegrette.books.repositories.BookRepositoryDynamo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +75,9 @@ public class BookControllerSecurityTest {
 
     @MockBean
     BookRepositoryDynamo bookRepositoryDynamo;
+
+    @MockBean
+    ModelSegmentSentence modelSegmentSentence;
 
     @Test
     void shouldNotAllowTokenWithInvalidAudience() throws Exception {

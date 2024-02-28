@@ -2,6 +2,7 @@ package com.rafanegrette.books.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rafanegrette.books.model.User;
+import com.rafanegrette.books.npl.config.ModelSegmentSentence;
 import com.rafanegrette.books.wavtovec.config.OpenAIConfiguration;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -64,6 +65,9 @@ class UserControllerTest {
 
     @MockBean(name ="webClientOpenAI")
     WebClient webClient;
+
+    @MockBean
+    ModelSegmentSentence modelSegmentSentence;
 
     @Test
     void loggedUserSuccess() throws Exception {

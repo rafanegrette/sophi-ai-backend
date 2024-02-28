@@ -1,0 +1,5 @@
+dependencies {
+    implementation project(":application")
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation group: 'org.apache.opennlp', name: 'opennlp-tools', version: '2.3.2'
+}

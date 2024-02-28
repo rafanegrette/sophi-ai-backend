@@ -1,13 +1,9 @@
 package com.rafanegrette.books;
 
+import com.rafanegrette.books.npl.config.ModelSegmentSentence;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
@@ -33,7 +29,8 @@ class SophiBooksApplicationTests {
 
 	@MockBean
 	DynamoDbClient dynamoDbClient;
-
+	@MockBean
+    ModelSegmentSentence modelSegmentSentence;
 
 	@Test
 	void contextLoads() {

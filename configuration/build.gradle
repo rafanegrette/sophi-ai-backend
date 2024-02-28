@@ -5,10 +5,12 @@ plugins {
 
 dependencies {
     implementation project(':application')
-    implementation project(':adapters:books-dynamodb')
+	implementation project(':adapters:natural-language-process')
+	implementation project(':adapters:books-dynamodb')
 	implementation project(':adapters:audio-files')
 	implementation project(':adapters:read-token')
 	implementation project(':adapters:open-api')
+
 	implementation 'org.springframework.boot:spring-boot-starter-web:'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'

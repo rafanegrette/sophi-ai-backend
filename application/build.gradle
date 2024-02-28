@@ -4,7 +4,7 @@ plugins {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.apache.pdfbox:pdfbox:3.0.0'
+	implementation 'org.apache.pdfbox:pdfbox:3.0.1'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.12.0'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 

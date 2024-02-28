@@ -183,4 +183,6 @@ class BookUserStateServiceTest {
         // then
         verify(bookUserStateRepository).saveState(userEmail, bookStateExpected);
     }
+
+    // TODO finish the whole reading
 }
