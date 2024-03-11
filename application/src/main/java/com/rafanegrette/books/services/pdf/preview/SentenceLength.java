@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum SentenceLength {
-    SHORT(8), MEDIUM(15), LARGE(25);
+    SHORT(11), MEDIUM(17), LARGE(28);
 
     private final int length;
 
-    private SentenceLength(int value) {
+    SentenceLength(int value) {
         this.length = value;
     }
 }
