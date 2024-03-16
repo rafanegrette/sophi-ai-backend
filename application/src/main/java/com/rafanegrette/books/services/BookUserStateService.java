@@ -5,6 +5,8 @@ import com.rafanegrette.books.port.out.BookUserStateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class BookUserStateService {
@@ -19,7 +21,7 @@ public class BookUserStateService {
         return bookUserStateRepository.getState(userId,bookId);
     }
 
-    public void increaseState(String bookId){
+    public void advanceState(String bookId){
         var userId = userSecurityService.getUser().email();
         var bookState = bookUserStateRepository.getState(userId, bookId);
         var newBookState = updateState(bookState);
@@ -28,44 +30,85 @@ public class BookUserStateService {
 
     private BookWriteState updateState(BookWriteState bookWriteState) {
         var book = readBookService.getBook(bookWriteState.bookId()).orElseThrow(BookNotFoundException::new);
-
-        Integer nextSentenceId = getNextSentence(book, bookWriteState);
-
-        if (nextSentenceId != null) {
-            return new BookWriteState(bookWriteState.bookId(),
-                    bookWriteState.chapterId(), bookWriteState.pageNo(), bookWriteState.paragraphId(),
-                    nextSentenceId);
+        if (isFinished(bookWriteState, book)) {
+            return finishedReadBookWriteState(bookWriteState);
         }
-
-        Paragraph stateParagraph = getNextParagraph(book, bookWriteState);
-
-        if (stateParagraph != null) {
-            return new BookWriteState(bookWriteState.bookId(),
-                    bookWriteState.chapterId(), bookWriteState.pageNo(), stateParagraph.id(),
-                    stateParagraph.sentences().get(0).id());
-        }
-
-        Page statePage = getNextPage(book, bookWriteState);
-
-        if (statePage != null) {
-            return new BookWriteState(bookWriteState.bookId(),
-                    bookWriteState.chapterId(), statePage.number(), statePage.paragraphs().get(0).id(),
-                    statePage.paragraphs().get(0).sentences().get(0).id());
-        }
-
-        Chapter stateChapter = getNextChapter(book, bookWriteState.chapterId());
-
-        if (stateChapter != null) {
-            return new BookWriteState(bookWriteState.bookId(),
-                    stateChapter.id(),
-                    stateChapter.pages().get(0).number(),
-                    stateChapter.pages().get(0).paragraphs().get(0).id(),
-                    stateChapter.pages().get(0).paragraphs().get(0).sentences().get(0).id());
-        }
-        return bookWriteState;
+        return increaseState(bookWriteState, book);
     }
 
-    private Chapter getNextChapter(Book book, Integer chapterId) {
+    private boolean isFinished(BookWriteState currentState, Book book) {
+        var bookLastChapter = book.chapters().getLast();
+        var bookLastPage = bookLastChapter.pages().getLast();
+        var bookLastParagraph = bookLastPage.paragraphs().getLast();
+        var bookLastSentence = bookLastParagraph.sentences().getLast();
+        return currentState.chapterId().equals(bookLastChapter.id()) &&
+                currentState.pageNo().equals(bookLastPage.number()) &&
+                currentState.paragraphId().equals(bookLastParagraph.id()) &&
+                currentState.sentenceId().equals(bookLastSentence.id());
+    }
+
+
+    private BookWriteState increaseState(BookWriteState bookWriteState, Book book) {
+        var nextSentenceId = Optional.ofNullable(getNextSentenceId(book, bookWriteState));
+        if (nextSentenceId.isPresent()) {
+            return writeStateSentence(nextSentenceId.get(), bookWriteState);
+        }
+        var nextParagraph = Optional.ofNullable(getNextParagraphId(book, bookWriteState));
+        if (nextParagraph.isPresent()) {
+            return writeStateParagraph(nextParagraph.get(), bookWriteState);
+        }
+
+        var nextPage = Optional.ofNullable(getNextPageId(book, bookWriteState));
+        if (nextPage.isPresent()) {
+            return writeStatePage(nextPage.get(), bookWriteState);
+        }
+
+        var nextChapter = Optional.ofNullable(getNextChapterId(book, bookWriteState.chapterId())).orElseThrow();
+        return new BookWriteState(bookWriteState.bookId(),
+                nextChapter.id(),
+                nextChapter.pages().get(0).number(),
+                nextChapter.pages().get(0).paragraphs().get(0).id(),
+                nextChapter.pages().get(0).paragraphs().get(0).sentences().get(0).id(),
+                false);
+    }
+
+    private BookWriteState writeStatePage(Page page, BookWriteState bookWriteState) {
+        return new BookWriteState(bookWriteState.bookId(),
+                bookWriteState.chapterId(),
+                page.number(),
+                page.paragraphs().get(0).id(),
+                page.paragraphs().get(0).sentences().get(0).id(),
+                false);
+    }
+
+    private BookWriteState writeStateParagraph(Paragraph paragraph, BookWriteState bookWriteState) {
+        return new BookWriteState(bookWriteState.bookId(),
+                bookWriteState.chapterId(),
+                bookWriteState.pageNo(),
+                paragraph.id(),
+                paragraph.sentences().get(0).id(),
+                false);
+    }
+
+    private BookWriteState finishedReadBookWriteState(BookWriteState bookWriteState) {
+        return new BookWriteState(bookWriteState.bookId(),
+                bookWriteState.chapterId(),
+                bookWriteState.pageNo(),
+                bookWriteState.paragraphId(),
+                bookWriteState.sentenceId(),
+                true);
+    }
+
+    private BookWriteState writeStateSentence(Integer sentenceId, BookWriteState bookWriteState) {
+        return new BookWriteState(bookWriteState.bookId(),
+                bookWriteState.chapterId(),
+                bookWriteState.pageNo(),
+                bookWriteState.paragraphId(),
+                sentenceId,
+                false);
+    }
+
+    private Chapter getNextChapterId(Book book, Integer chapterId) {
         var chapters = book.chapters();
 
         for (int i = 0; i < chapters.size() - 1; i++) {
@@ -76,7 +119,7 @@ public class BookUserStateService {
         return null;
     }
 
-    private Page getNextPage(Book book, BookWriteState bookWriteState) {
+    private Page getNextPageId(Book book, BookWriteState bookWriteState) {
         var pages = book.chapters()
                 .stream()
                 .filter(c -> c.id().equals(bookWriteState.chapterId()))
@@ -91,7 +134,7 @@ public class BookUserStateService {
         return null;
     }
 
-    private Paragraph getNextParagraph(Book book, BookWriteState bookWriteState) {
+    private Paragraph getNextParagraphId(Book book, BookWriteState bookWriteState) {
         var paragraph = book.chapters()
                 .stream()
                 .filter(c -> c.id().equals(bookWriteState.chapterId()))
@@ -108,7 +151,7 @@ public class BookUserStateService {
         return null;
     }
 
-    private Integer getNextSentence(Book book, BookWriteState bookWriteState) {
+    private Integer getNextSentenceId(Book book, BookWriteState bookWriteState) {
         var sentences = book.chapters()
                 .stream()
                 .filter(c -> c.id().equals(bookWriteState.chapterId()))

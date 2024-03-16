@@ -7,10 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,8 +38,6 @@ class ReadTokenGeneratorTest {
 	void testReadTokenGenerator() throws MalformedURLException {
 		
 		// given
-		var preSignUrls = List.of("https://sophi-books.s3.amazonaws.com/d9eff110-0924-408e-98db-62be9cf3cfb0/1/1/1/0?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20230629T020154Z&X-Amz-SignedHeaders=host&X-Amz-Expires=14400&", 
-				"https://sophi-books.s3.amazonaws.com/d9eff110-0924-408e-98db-62be9cf3cfb0/1/1/1/2?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20230629T020154Z&X-Amz-SignedHeaders=host&X-Amz-Expires=14400&");
 		var pagePath = "d9eff110-0924-408e-98db-62be9cf3cfb0/1/1/";
 		var listResponse = ListObjectsV2Response.builder()
 				.contents(S3Object.builder().key("1/0").build(),
@@ -53,7 +48,7 @@ class ReadTokenGeneratorTest {
 		when(s3Client.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(listResponse);
 		when(presigner.presignGetObject(any(GetObjectPresignRequest.class))).thenReturn(
 				presignedGetObjectRequest);
-		when(presignedGetObjectRequest.url()).thenReturn(new URL("https://s3skfjdkfj.com"));
+		when(presignedGetObjectRequest.url()).thenReturn(Path.of("https://s3skfjdkfj.com").toUri().toURL());
 		var preSignUrlsReturned = readTokenGenerator.generateSignedUrls(pagePath);
 		
 		// then

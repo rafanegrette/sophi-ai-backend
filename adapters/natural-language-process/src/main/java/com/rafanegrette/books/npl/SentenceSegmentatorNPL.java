@@ -29,8 +29,9 @@ public class SentenceSegmentatorNPL implements SentenceSegmentator {
     private List<String> splitLongPhrases(SentenceLength sentenceLength, String[] detectedSentences) {
         List<String> totalSentences = new ArrayList<>();
         for (var s : detectedSentences) {
-            if (s.length() > sentenceLength.getLength()) {
-                var wordsPhrase = s.split(" ");
+            var wordsPhrase = s.split(" ");
+            if (wordsPhrase.length > sentenceLength.getLength()) {
+
                 var remainingWords = wordsPhrase.length;
                 var startIndex = 0;
                 while (remainingWords > 0) {
@@ -38,13 +39,22 @@ public class SentenceSegmentatorNPL implements SentenceSegmentator {
                     var text = String.join(" ", Arrays.copyOfRange(wordsPhrase, startIndex, chunkSize + startIndex));
                     remainingWords -= chunkSize;
                     startIndex += chunkSize;
-                    totalSentences.add(text);
+                    if (isLastCharacterNonSpace(totalSentences, text)) {
+                        totalSentences.add(" " + text);
+                    } else {
+                        totalSentences.add(text);
+                    }
                 }
             } else {
                 totalSentences.add(s);
             }
         }
         return totalSentences;
+    }
+
+    private boolean isLastCharacterNonSpace(List<String> totalSentences, String text) {
+        return !totalSentences.isEmpty() && (totalSentences.getLast().indexOf(totalSentences.getLast().length() - 1) != ' '
+                || text.charAt(0) != ' ');
     }
 
     private LinkedList<Sentence> generateSentences(List<String> totalSentences) {

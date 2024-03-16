@@ -36,7 +36,8 @@ class SaveBookUserStateServiceTest {
                 book.chapters().get(0).id(),
                 book.chapters().get(0).pages().get(0).number(),
                 book.chapters().get(0).pages().get(0).paragraphs().get(0).id(),
-                book.chapters().get(0).pages().get(0).paragraphs().get(0).sentences().get(0).id());
+                book.chapters().get(0).pages().get(0).paragraphs().get(0).sentences().get(0).id(),
+                false);
         given(userSecurityService.getUser()).willReturn(new User("fulano", userEmail));
 
         // when

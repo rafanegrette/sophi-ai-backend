@@ -15,7 +15,10 @@ public class ContentIndexDyna implements Serializable {
 	
 	private Integer index;
 	private String title;
-	
+	Integer pageStart;
+	Integer pageEnd;
+	Integer chapterId;
+
 	@DynamoDbPartitionKey 
 	public Integer getIndex() {
 		return index;
@@ -29,6 +32,28 @@ public class ContentIndexDyna implements Serializable {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
-	
+
+	public Integer getPageStart() {
+		return pageStart;
+	}
+
+	public void setPageStart(Integer pageStart) {
+		this.pageStart = pageStart;
+	}
+
+	public Integer getPageEnd() {
+		return pageEnd;
+	}
+
+	public void setPageEnd(Integer pageEnd) {
+		this.pageEnd = pageEnd;
+	}
+
+	public Integer getChapterId() {
+		return chapterId;
+	}
+
+	public void setChapterId(Integer chapterId) {
+		this.chapterId = chapterId;
+	}
 }

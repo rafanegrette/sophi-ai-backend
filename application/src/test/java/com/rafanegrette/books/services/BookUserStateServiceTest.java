@@ -4,7 +4,6 @@ import com.rafanegrette.books.model.BookWriteState;
 import com.rafanegrette.books.model.User;
 import com.rafanegrette.books.model.mother.BookMother;
 import com.rafanegrette.books.port.out.BookUserStateRepository;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,9 +15,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +47,7 @@ class BookUserStateServiceTest {
 
 
         given(bookUserStateRepository.getState(userEmail, bookId))
-                .willReturn(new BookWriteState(bookId, 1,1,1,1));
+                .willReturn(new BookWriteState(bookId, 1,1,1,1, false));
         // when
         var writeBookState = bookUserStateService.getState(bookId);
         // then
@@ -71,18 +68,20 @@ class BookUserStateServiceTest {
                             currentChapter.id(),
                             currentPage.number(),
                             currentParagraph.id(),
-                            currentSentence.id());
+                            currentSentence.id(),
+                false);
         var bookStateExpected = new BookWriteState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
                 currentParagraph.id(),
-                currentParagraph.sentences().get(1).id());
+                currentParagraph.sentences().get(1).id(),
+                false);
 
         given(readBookService.getBook(book.id())).willReturn(Optional.of(book));
         given(bookUserStateRepository.getState(userEmail, book.id())).willReturn(bookState);
 
         // when
-        bookUserStateService.increaseState(book.id());
+        bookUserStateService.advanceState(book.id());
 
         // then
 
@@ -101,18 +100,20 @@ class BookUserStateServiceTest {
                 currentChapter.id(),
                 currentPage.number(),
                 currentParagraph.id(),
-                currentSentence.id());
+                currentSentence.id(),
+                false);
         var bookStateExpected = new BookWriteState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
                 currentPage.paragraphs().get(1).id(),
-                currentPage.paragraphs().get(1).sentences().get(0).id());
+                currentPage.paragraphs().get(1).sentences().get(0).id(),
+                false);
 
         given(readBookService.getBook(book.id())).willReturn(Optional.of(book));
         given(bookUserStateRepository.getState(userEmail, book.id())).willReturn(bookState);
 
         // when
-        bookUserStateService.increaseState(book.id());
+        bookUserStateService.advanceState(book.id());
 
         // then
 
@@ -134,18 +135,20 @@ class BookUserStateServiceTest {
                 currentChapter.id(),
                 currentPage.number(),
                 currentParagraph.id(),
-                currentSentence.id());
+                currentSentence.id(),
+                false);
         var bookStateExpected = new BookWriteState(book.id(),
                 currentChapter.id(),
                 nextPage.number(),
                 nextParagraph.id(),
-                nextSentence.id());
+                nextSentence.id(),
+                false);
 
         given(readBookService.getBook(book.id())).willReturn(Optional.of(book));
         given(bookUserStateRepository.getState(userEmail, book.id())).willReturn(bookState);
 
         // when
-        bookUserStateService.increaseState(book.id());
+        bookUserStateService.advanceState(book.id());
 
         // then
         verify(bookUserStateRepository).saveState(userEmail, bookStateExpected);
@@ -167,22 +170,82 @@ class BookUserStateServiceTest {
                 currentChapter.id(),
                 currentPage.number(),
                 currentParagraph.id(),
-                currentSentence.id());
+                currentSentence.id(),
+                false);
         var bookStateExpected = new BookWriteState(book.id(),
                 nextChapter.id(),
                 nextPage.number(),
                 nextParagraph.id(),
-                nextSentence.id());
+                nextSentence.id(),
+                false);
 
         given(readBookService.getBook(book.id())).willReturn(Optional.of(book));
         given(bookUserStateRepository.getState(userEmail, book.id())).willReturn(bookState);
 
         // when
-        bookUserStateService.increaseState(book.id());
+        bookUserStateService.advanceState(book.id());
 
         // then
         verify(bookUserStateRepository).saveState(userEmail, bookStateExpected);
     }
 
-    // TODO finish the whole reading
+
+    @Test
+    void testBookWriteLastSentenceSuccess() {
+        // given
+        var book = BookMother.harryPotter1().build();
+        var currentChapter = book.chapters().get(1);  // last chapter
+        var currentPage = currentChapter.pages().get(1); // last page
+        var currentParagraph = currentPage.paragraphs().get(2); // last paragraph
+        var currentSentence = currentParagraph.sentences().get(0); // before last sentence
+        var lastSentence = currentParagraph.sentences().get(1);
+        var bookState = new BookWriteState(book.id(),
+                currentChapter.id(),
+                currentPage.number(),
+                currentParagraph.id(),
+                currentSentence.id(),
+                false);
+        var bookStateExpected = new BookWriteState(book.id(),
+                currentChapter.id(),
+                currentPage.number(),
+                currentParagraph.id(),
+                lastSentence.id(),
+                false);
+
+        given(readBookService.getBook(book.id())).willReturn(Optional.of(book));
+        given(bookUserStateRepository.getState(userEmail, book.id())).willReturn(bookState);
+        // when
+        bookUserStateService.advanceState(book.id());
+        // then
+        verify(bookUserStateRepository).saveState(userEmail, bookStateExpected);
+    }
+
+    @Test
+    void testBookWriteFinishedSuccess() {
+        // given
+        var book = BookMother.harryPotter1().build();
+        var currentChapter = book.chapters().get(1);  // last chapter
+        var currentPage = currentChapter.pages().get(1); // last page
+        var currentParagraph = currentPage.paragraphs().get(2); // last paragraph
+        var lastSentence = currentParagraph.sentences().get(1);
+        var bookState = new BookWriteState(book.id(),
+                currentChapter.id(),
+                currentPage.number(),
+                currentParagraph.id(),
+                lastSentence.id(),
+                false);
+        var bookStateExpected = new BookWriteState(book.id(),
+                currentChapter.id(),
+                currentPage.number(),
+                currentParagraph.id(),
+                lastSentence.id(),
+                true);
+
+        given(readBookService.getBook(book.id())).willReturn(Optional.of(book));
+        given(bookUserStateRepository.getState(userEmail, book.id())).willReturn(bookState);
+        // when
+        bookUserStateService.advanceState(book.id());
+        // then
+        verify(bookUserStateRepository).saveState(userEmail, bookStateExpected);
+    }
 }

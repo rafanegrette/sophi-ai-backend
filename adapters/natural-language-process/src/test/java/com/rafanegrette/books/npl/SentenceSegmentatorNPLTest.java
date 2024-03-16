@@ -68,8 +68,8 @@ class SentenceSegmentatorNPLTest {
 
         List<Sentence> sentencesExpected = new ArrayList<>();
         String[] modelResult = {sentences};
-        sentencesExpected.add(new Sentence(0, "something peculiar a cat reading a map for a second, Mr. Dursley didn’t realize what"));
-        sentencesExpected.add(new Sentence(1, "he had seen that it wasn't good but we did I was certainly"));
+        sentencesExpected.add(new Sentence(0, "something peculiar a cat reading a map for a second, Mr. Dursley didn’t realize what he had"));
+        sentencesExpected.add(new Sentence(1, " seen that it wasn't good but we did I was certainly"));
 
         given(sentenceDetector.detectSentence(sentences)).willReturn(modelResult);
 

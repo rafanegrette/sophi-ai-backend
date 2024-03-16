@@ -20,7 +20,8 @@ public class SaveBookUserStateService implements SaveBookService  {
                 book.chapters().get(0).id(),
                 book.chapters().get(0).pages().get(0).number(),
                 book.chapters().get(0).pages().get(0).paragraphs().get(0).id(),
-                book.chapters().get(0).pages().get(0).paragraphs().get(0).sentences().get(0).id());
+                book.chapters().get(0).pages().get(0).paragraphs().get(0).sentences().get(0).id(),
+                false);
         var userEmail = userSecurityService.getUser().email();
         stateRepository.save(userEmail, bookWriteState);
     }

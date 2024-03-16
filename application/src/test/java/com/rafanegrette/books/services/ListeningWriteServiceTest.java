@@ -35,7 +35,7 @@ class ListeningWriteServiceTest {
         assertNotNull(response);
         assertTrue(response.accepted());
         assertEquals(bookText, response.result());
-        verify(bookUserStateService).increaseState(bookId);
+        verify(bookUserStateService).advanceState(bookId);
     }
 
     @Test

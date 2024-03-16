@@ -4,5 +4,6 @@ public record BookWriteState(String bookId,
                              Integer chapterId,
                              Integer pageNo,
                              Integer paragraphId,
-                             Integer sentenceId) {
+                             Integer sentenceId,
+                             Boolean finished) {
 }

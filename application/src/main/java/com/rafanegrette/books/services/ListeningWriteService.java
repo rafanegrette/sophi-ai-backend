@@ -23,7 +23,7 @@ public class ListeningWriteService extends DynamicMatchingPhrases<Character> {
         var matchedText = getMatched(originalArray, userArray);
 
         if (listeningSentenceRequest.userText().equalsIgnoreCase((matchedText))) {
-            bookUserStateService.increaseState(listeningSentenceRequest.bookId());
+            bookUserStateService.advanceState(listeningSentenceRequest.bookId());
             return new ListeningSentenceResponse(true, matchedText);
         }
         return new ListeningSentenceResponse(false, matchedText);

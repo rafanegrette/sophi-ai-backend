@@ -9,16 +9,12 @@ import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
@@ -26,8 +22,6 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectsResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
-import software.amazon.awssdk.services.s3.model.S3Object;
-import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Publisher;
 
 @ExtendWith(MockitoExtension.class)
 class DeleteAudioFileServiceTest {
@@ -70,27 +64,6 @@ class DeleteAudioFileServiceTest {
 		// then
 		assertThrows(ExecutionException.class, () -> deleteAudioService.deleteAudioBooks(bookId));
 	}
-	
-	private Void mockPublisherBehaviour(InvocationOnMock invocation) {
-		Subscriber subscriber = invocation.getArgument(0);
-		subscriber.onSubscribe(new Subscription() {
-			@Override
-			public void request(long n) {
-				for (int i = 0; i < 10; i++) {
-					ListObjectsV2Response response = ListObjectsV2Response.builder()
-							.contents(S3Object.builder().key(bookId + i).build())
-							.build();
-					subscriber.onNext(response);
-				}
-				subscriber.onComplete();
-			}
-			
-			@Override
-			public void cancel() {
-				
-			}
-		});
-		return null;
-	}
+
 
 }

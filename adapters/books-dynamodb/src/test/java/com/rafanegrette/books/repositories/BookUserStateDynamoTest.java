@@ -34,9 +34,9 @@ class BookUserStateDynamoTest {
     @Test
     void saveUpdating() {
         // given
-        var bookUserState = new BookWriteState("4d5sdd4f5f", 0, 2, 3,0);
+        var bookUserState = new BookWriteState("4d5sdd4f5f", 0, 2, 3,0, false);
         var userEmail = "fulanio@gmail.com";
-        var bookWriteStateDyna = new BookWriteStateDyna("4d5sdd4f5f", 0, 2, 3,0);
+        var bookWriteStateDyna = new BookWriteStateDyna("4d5sdd4f5f", 0, 2, 3,0, false);
         //var bookUserStateDyna = new UserBookWriteStateDyna(userEmail, List.of(bookWriteStateDyna));
         given(bookUserStateTable.getItem(any(Consumer.class))).willReturn(new UserBookWriteStateDyna(userEmail, new ArrayList<>()));
 
@@ -50,9 +50,9 @@ class BookUserStateDynamoTest {
     @Test
     void saveCreatingNewRegistry() {
         // given
-        var bookUserState = new BookWriteState("4d5sdd4f5f", 0, 2, 3,0);
+        var bookUserState = new BookWriteState("4d5sdd4f5f", 0, 2, 3,0, false);
         var userEmail = "fulanio@gmail.com";
-        var bookWriteStateDyna = new BookWriteStateDyna("4d5sdd4f5f", 0, 2, 3,0);
+        var bookWriteStateDyna = new BookWriteStateDyna("4d5sdd4f5f", 0, 2, 3,0, false);
         //var bookUserStateDyna = new UserBookWriteStateDyna(userEmail, List.of(bookWriteStateDyna));
         //given(bookUserStateTable.getItem(any(Consumer.class))).willReturn(new UserBookWriteStateDyna(userEmail, new ArrayList<>()));
 
@@ -70,9 +70,9 @@ class BookUserStateDynamoTest {
         var bookId = "dskljkhjfkhv7dsf";
         given(bookUserStateTable.getItem(any(Consumer.class)))
                 .willReturn(new UserBookWriteStateDyna(userId,
-                        List.of(new BookWriteStateDyna(bookId, 2, 1, 1,1))));
+                        List.of(new BookWriteStateDyna(bookId, 2, 1, 1,1, false))));
 
-        // when
+        // when||
         var bookWriteState = bookUserStateDynamo.getState(userId, bookId);
 
         //then
@@ -89,7 +89,7 @@ class BookUserStateDynamoTest {
     void saveBookWriteState() {
         var userId = "fulano@gmail.com";
         var bookId = "dskljkhjfkhv7dsf";
-        BookWriteState bookWriteState = new BookWriteState(bookId, 0, 0,1,1);
+        BookWriteState bookWriteState = new BookWriteState(bookId, 0, 0,1,1, false);
         bookUserStateDynamo.saveState(userId, bookWriteState);
 
         verify(bookUserStateTable).updateItem(any(Consumer.class));

@@ -18,6 +18,7 @@ public class BookWriteStateDyna implements Serializable {
     Integer pageNo;
     Integer paragraphId;
     Integer sentenceId;
+    Boolean finished;
 
     @DynamoDbPartitionKey
     public String getBookId() {
@@ -58,5 +59,13 @@ public class BookWriteStateDyna implements Serializable {
 
     public void setSentenceId(Integer sentenceId) {
         this.sentenceId = sentenceId;
+    }
+
+    public Boolean getFinished() {
+        return finished;
+    }
+
+    public void setFinished(Boolean finished) {
+        this.finished = finished;
     }
 }

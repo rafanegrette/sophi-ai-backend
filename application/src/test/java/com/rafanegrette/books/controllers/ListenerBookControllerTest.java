@@ -43,7 +43,7 @@ public class ListenerBookControllerTest {
     @Test
     void getBookWriteState() throws Exception {
         // given
-        var bookWriteState = new BookWriteState(BOOK_ID, 1, 2, 0, 0);
+        var bookWriteState = new BookWriteState(BOOK_ID, 1, 2, 0, 0, false);
 
         given(bookUserStateService.getState(BOOK_ID)).willReturn(bookWriteState);
 
