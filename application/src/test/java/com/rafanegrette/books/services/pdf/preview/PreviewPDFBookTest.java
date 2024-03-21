@@ -14,7 +14,6 @@ import java.util.List;
 import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
-import com.rafanegrette.books.model.formats.ParagraphThreshold;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -51,7 +50,7 @@ class PreviewPDFBookTest {
                 false,
                 240);
 	    var formParameter = new FormParameter("fantasi", 
-	    		new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP),
+	    		new ParagraphFormats(2.4f, false, ParagraphSeparator.TWO_JUMP),
 	    		ChapterTitleType.CONTENT,
 	    		FirstPageOffset.ONE,
 	    		false);
@@ -87,7 +86,7 @@ class PreviewPDFBookTest {
                 false,
                 THRESHOLD);
         var formParameter = new FormParameter("fantasi",
-                new ParagraphFormats(ParagraphThreshold.THREE, false, ParagraphSeparator.TWO_JUMP),
+                new ParagraphFormats(3.0f, false, ParagraphSeparator.TWO_JUMP),
                 ChapterTitleType.CONTENT,
                 FirstPageOffset.ONE,
                 false);

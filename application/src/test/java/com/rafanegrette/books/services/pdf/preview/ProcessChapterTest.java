@@ -4,13 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
-import com.rafanegrette.books.model.formats.ParagraphThreshold;
 import com.rafanegrette.books.services.NotContentException;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -22,15 +20,12 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPa
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -50,7 +45,7 @@ public class ProcessChapterTest {
         // given
         PDDocument document = getDocumentWithParagraph();
         var contentIndex = new ContentIndex(2, "Chapter 2", 8, 12, 2);
-        var paragraphFormat = new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP);
+        var paragraphFormat = new ParagraphFormats(2.4f, false, ParagraphSeparator.TWO_JUMP);
         var formParameter = new FormParameter("Harry-1",
                 paragraphFormat,
                 ChapterTitleType.CONTENT,
@@ -75,7 +70,7 @@ public class ProcessChapterTest {
     void testGetRightChapterIdTC1() throws IOException {
         PDDocument document = getDocumentWithParagraph();
         var contentIndexSix = new ContentIndex(6, "Chapter 6", 6 * 4, 6 * 4 + 4, 6);
-        var formatParagraph = new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP);
+        var formatParagraph = new ParagraphFormats(2.4f, false, ParagraphSeparator.TWO_JUMP);
         var formParameter = new FormParameter("Harry-1",
                 formatParagraph,
                 ChapterTitleType.CONTENT,
@@ -96,7 +91,7 @@ public class ProcessChapterTest {
     @Test
     void testGetPagesWithSeparatorTC2() throws IOException {
 
-        var formatParagraph = new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.ONE_JUMP);
+        var formatParagraph = new ParagraphFormats(2.4f, false, ParagraphSeparator.ONE_JUMP);
         var formParameter = new FormParameter("Harry-2",
                 formatParagraph,
                 ChapterTitleType.BOOKMARK,
@@ -122,7 +117,7 @@ public class ProcessChapterTest {
 
     @Test
     void testGetChapterByContentIndexTC2() throws IOException {
-        var formatParagraph = new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.ONE_JUMP);
+        var formatParagraph = new ParagraphFormats(2.4f, false, ParagraphSeparator.ONE_JUMP);
         var formParameter = new FormParameter("Harry-2",
                 formatParagraph,
                 ChapterTitleType.BOOKMARK,
@@ -147,7 +142,7 @@ public class ProcessChapterTest {
     void testGetContentEmptyPageShouldFail() throws IOException {
         var document = getDocumentWithoutPages();
         var formParameter = new FormParameter("Harry-2",
-                new ParagraphFormats(ParagraphThreshold.THREE, true, ParagraphSeparator.TWO_JUMP),
+                new ParagraphFormats(3.0f, true, ParagraphSeparator.TWO_JUMP),
                 ChapterTitleType.BOOKMARK,
                 FirstPageOffset.ONE,
                 false);
@@ -166,7 +161,7 @@ public class ProcessChapterTest {
         Path path = Paths.get("/home/rafa/Documents/books/mypdfbook.pdf");
         byte[] bytesFile = Files.readAllBytes(path);
         var formParameter = new FormParameter("Harry-2",
-                new ParagraphFormats(ParagraphThreshold.THREE, true, ParagraphSeparator.TWO_JUMP),
+                new ParagraphFormats(3.0f, true, ParagraphSeparator.TWO_JUMP),
                 ChapterTitleType.BOOKMARK,
                 FirstPageOffset.ONE,
                 false);
@@ -183,7 +178,7 @@ public class ProcessChapterTest {
     void testNoPagesChapter0NestedBookmarkTC3() throws IOException
     {
         var formParameter = new FormParameter("Harry-2",
-                new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.ONE_JUMP),
+                new ParagraphFormats(2.4f, false, ParagraphSeparator.ONE_JUMP),
                 ChapterTitleType.BOOKMARK,
                 FirstPageOffset.ONE,
                 true);
@@ -197,7 +192,7 @@ public class ProcessChapterTest {
     @Test
     void testNoPagesChapter1NestedBookmarkTC3() throws IOException
     {
-        var formatParagraph = new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.ONE_JUMP);
+        var formatParagraph = new ParagraphFormats(2.4f, false, ParagraphSeparator.ONE_JUMP);
         var formParameter = new FormParameter("Harry-2",
                 formatParagraph,
                 ChapterTitleType.BOOKMARK,

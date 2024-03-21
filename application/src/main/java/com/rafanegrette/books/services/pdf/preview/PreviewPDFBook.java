@@ -6,13 +6,12 @@ import java.util.Base64;
 import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
-import com.rafanegrette.books.model.formats.ParagraphThreshold;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PreviewPDFBook implements PreviewBookService {
 
-    private LoadPDFService pdfService;
+    private final LoadPDFService pdfService;
 
     public PreviewPDFBook(LoadPDFService loadPdfService) {
         this.pdfService = loadPdfService;
@@ -38,15 +37,13 @@ public class PreviewPDFBook implements PreviewBookService {
 				uploadForm.firstPageOffset().equals(1) ?
 				FirstPageOffset.ONE
 				: FirstPageOffset.TWO;
-		var paragraphThreshold = uploadForm.paragraphThreshold() == 300 ? ParagraphThreshold.THREE
-				: ParagraphThreshold.DEFAULT;
-		var formParameter = new FormParameter(
+		var paragraphThreshold = uploadForm.paragraphThreshold() / 100.0f;
+		return new FormParameter(
 				uploadForm.bookLabel(),
 				new ParagraphFormats(paragraphThreshold, uploadForm.extraFormat(), separator),
 				chapterTitleType,
 				firstPageOffset,
 				uploadForm.fixTitleHP1());
-		return formParameter;
 	}
 
 

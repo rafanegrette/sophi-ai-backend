@@ -15,7 +15,6 @@ import java.util.List;
 import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
-import com.rafanegrette.books.model.formats.ParagraphThreshold;
 import com.rafanegrette.books.model.mother.ChapterMother;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -32,8 +31,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.ResourceUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -64,7 +61,7 @@ class ProcessBookPDFTest {
         PDDocument document = BookPDFTest.getDocumentWith17BookMarks();
         byte[] bytesFile = getByteDocument(document);
         var formParameter = new FormParameter("Harry-1",
-                new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP),
+                new ParagraphFormats(2.4f, false, ParagraphSeparator.TWO_JUMP),
                 ChapterTitleType.CONTENT,
                 FirstPageOffset.TWO,
                 true);
@@ -83,7 +80,7 @@ class ProcessBookPDFTest {
     void testGetAllChapters() throws IOException {
         byte[] bytesFile = getByteDocumentWithParagraph();
         var formParameter = new FormParameter("Harry-1",
-                new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP),
+                new ParagraphFormats(2.4f, false, ParagraphSeparator.TWO_JUMP),
                 ChapterTitleType.CONTENT,
                 FirstPageOffset.TWO,
                 true);
@@ -110,7 +107,7 @@ class ProcessBookPDFTest {
     void testBookWithoutPages() throws IOException {
         var binaryBook = getByteDocument(getDocumentWithoutPages());
         var formParameter = new FormParameter("Harry-2",
-                new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.ONE_JUMP),
+                new ParagraphFormats(2.4f, false, ParagraphSeparator.ONE_JUMP),
                 ChapterTitleType.BOOKMARK,
                 FirstPageOffset.ONE,
                 true);

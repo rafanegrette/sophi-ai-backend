@@ -6,16 +6,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
 import com.rafanegrette.books.model.Paragraph;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
-import com.rafanegrette.books.model.formats.ParagraphThreshold;
-import com.rafanegrette.books.port.out.SentenceSegmentator;
-import com.rafanegrette.books.services.ContentPage;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -27,14 +23,11 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocume
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import com.rafanegrette.books.model.Page;
 import com.rafanegrette.books.model.Sentence;
@@ -64,7 +57,7 @@ class ProcessContentPagePDFTest {
 
     @Test
     void testGetPageWithSeparator() throws IOException {
-        var paragraphFormats = new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP);
+        var paragraphFormats = new ParagraphFormats(2.4f, false, ParagraphSeparator.TWO_JUMP);
         List<Paragraph> paragraphsReturned = List.of(new Paragraph(0, List.of(new Sentence(0, "Page Title"))));
         given(processParagraphPDF.getParagraphs(anyString(), any(ParagraphFormats.class))).willReturn(paragraphsReturned);
 
@@ -75,8 +68,8 @@ class ProcessContentPagePDFTest {
     @Test
     void testGetPageThreshold() throws IOException {
         // Given
-        var paragraphFormatsDefault = new ParagraphFormats(ParagraphThreshold.DEFAULT, false, ParagraphSeparator.TWO_JUMP);
-        var paragraphFormatsExtra = new ParagraphFormats(ParagraphThreshold.THREE, true, ParagraphSeparator.TWO_JUMP);
+        var paragraphFormatsDefault = new ParagraphFormats(2.4f, false, ParagraphSeparator.TWO_JUMP);
+        var paragraphFormatsExtra = new ParagraphFormats(3.0f, true, ParagraphSeparator.TWO_JUMP);
 
         // When
         String pageDefaultFormat = processContentPage.extractRawText(document, 6, paragraphFormatsDefault, s -> s);

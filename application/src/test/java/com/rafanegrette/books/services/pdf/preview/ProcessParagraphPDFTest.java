@@ -3,8 +3,6 @@ package com.rafanegrette.books.services.pdf.preview;
 import com.rafanegrette.books.model.Sentence;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
-import com.rafanegrette.books.model.formats.ParagraphThreshold;
-import com.rafanegrette.books.model.mother.ParagraphMother;
 import com.rafanegrette.books.port.out.SentenceSegmentator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +51,7 @@ public class ProcessParagraphPDFTest {
     void testGetParagraphs() {
         var sentenceList = List.of(new Sentence(0, "This is the third boring story"));
         var sentences = new LinkedList<>(sentenceList);
-        var paragraphFormatsExtra = new ParagraphFormats(ParagraphThreshold.THREE, true, ParagraphSeparator.TWO_JUMP);
+        var paragraphFormatsExtra = new ParagraphFormats(3.0f, true, ParagraphSeparator.TWO_JUMP);
         given(sentenceSegmentator.createSentences(anyString(), any())).willReturn(sentences);
 
         var paragraphs = processParagraph.getParagraphs(textTC3, paragraphFormatsExtra);

@@ -90,7 +90,7 @@ public class ProcessContentPagePDF implements ContentPage {
         PrintWriter writer = new PrintWriter(out);
         pdfStripper.setAddMoreFormatting(paragraphFormats.applyExtraFormat());
         pdfStripper.setSuppressDuplicateOverlappingText(false);
-        pdfStripper.setDropThreshold(paragraphFormats.paragraphThreshold().getThreshold());
+        pdfStripper.setDropThreshold(paragraphFormats.paragraphThreshold());
         pdfStripper.writeText(document, writer);
 
         return fixTitleMixupFirstSentenceHP2.apply(out.toString());
