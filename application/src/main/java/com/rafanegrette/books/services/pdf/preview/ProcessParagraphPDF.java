@@ -27,7 +27,7 @@ public class ProcessParagraphPDF {
         for (int i = 0; i < paragraphs.length; i++) {
             if (paragraphs[i].isBlank()) continue;
 
-            LinkedList<Sentence> sentences = sentenceSegmentator.createSentences(paragraphs[i], SentenceLength.MEDIUM );
+            LinkedList<Sentence> sentences = sentenceSegmentator.createSentences(paragraphs[i], SentenceLength.LARGE);
 
             sentences = formatSentences(sentences);
 
