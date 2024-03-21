@@ -154,25 +154,6 @@ public class ProcessChapterTest {
 
     }
 
-    @Test
-    @Disabled
-    void testRealBookDissable() throws IOException
-    {
-        Path path = Paths.get("/home/rafa/Documents/books/mypdfbook.pdf");
-        byte[] bytesFile = Files.readAllBytes(path);
-        var formParameter = new FormParameter("Harry-2",
-                new ParagraphFormats(3.0f, true, ParagraphSeparator.TWO_JUMP),
-                ChapterTitleType.BOOKMARK,
-                FirstPageOffset.ONE,
-                false);
-        PDDocument document = getDocumentFromByteFile(bytesFile, formParameter);
-        var contentIndexThree = new ContentIndex(2, "Chapter 2", 3, 5, 2);
-
-        var chapterReturned = processChapterPDF.getChapter(document, contentIndexThree, formParameter);
-
-        assertNotNull(chapterReturned);
-
-    }
 
     @Test
     void testNoPagesChapter0NestedBookmarkTC3() throws IOException
@@ -209,11 +190,6 @@ public class ProcessChapterTest {
         Chapter chapterReturned = processChapterPDF.getChapter(document, contentIndexOne, formParameter);
 
         assertEquals(2, chapterReturned.pages().size());
-    }
-
-
-    private PDDocument getDocumentFromByteFile(byte[] bookFile, FormParameter formParameter) throws IOException {
-        return Loader.loadPDF(bookFile);
     }
 
     private PDDocument getDocumentWithoutPages() {

@@ -39,7 +39,7 @@ public class ProcessContentPagePDF implements ContentPage {
     /***
      * TC2 FirstPage, This Method include a Function to extract title mixup into sentences like:
      * T HE WORST BIRTHDAY for the first time
-     * @param sentence with title in uppercase
+     * @param document with title in uppercase
      * @return clean sentence
      */
     public Page getContentPageFirstPage(PDDocument document, int noPage,
@@ -89,7 +89,7 @@ public class ProcessContentPagePDF implements ContentPage {
         StringWriter out = new StringWriter();
         PrintWriter writer = new PrintWriter(out);
         pdfStripper.setAddMoreFormatting(paragraphFormats.applyExtraFormat());
-        pdfStripper.setSuppressDuplicateOverlappingText(false);
+        pdfStripper.setSuppressDuplicateOverlappingText(true);
         pdfStripper.setDropThreshold(paragraphFormats.paragraphThreshold());
         pdfStripper.writeText(document, writer);
 

@@ -6,12 +6,16 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import com.rafanegrette.books.model.Paragraph;
+import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -23,14 +27,12 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocume
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.rafanegrette.books.model.Page;
-import com.rafanegrette.books.model.Sentence;
 
 @ExtendWith(MockitoExtension.class)
 class ProcessContentPagePDFTest {
@@ -78,6 +80,30 @@ class ProcessContentPagePDFTest {
         // Then
         assertEquals(17, pageExtraFormat.split("\n").length);
         assertEquals(8, pageDefaultFormat.split("\n").length);
+    }
+
+    @Test
+    @Disabled
+    void testRealBookDissable() throws IOException
+    {
+        Path path = Paths.get("/home/rafa/Documents/books/neuromancer.pdf");
+        var paragraphFormatsDefault = new ParagraphFormats(1.6f, false, ParagraphSeparator.TWO_JUMP);
+        byte[] bytesFile = Files.readAllBytes(path);
+        var formParameter = new FormParameter("Harry-2",
+                paragraphFormatsDefault,
+                ChapterTitleType.BOOKMARK,
+                FirstPageOffset.ONE,
+                false);
+        PDDocument document = getDocumentFromByteFile(bytesFile, formParameter);
+
+        var rawPageReturned = processContentPage.extractRawText(document, 8, paragraphFormatsDefault, s -> s);
+
+        assertNotNull(rawPageReturned);
+
+    }
+
+    private PDDocument getDocumentFromByteFile(byte[] bookFile, FormParameter formParameter) throws IOException {
+        return Loader.loadPDF(bookFile);
     }
 
 

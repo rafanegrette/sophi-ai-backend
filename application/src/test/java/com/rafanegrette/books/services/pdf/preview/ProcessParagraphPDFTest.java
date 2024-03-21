@@ -4,6 +4,7 @@ import com.rafanegrette.books.model.Sentence;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
 import com.rafanegrette.books.port.out.SentenceSegmentator;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class ProcessParagraphPDFTest {
@@ -37,13 +39,13 @@ public class ProcessParagraphPDFTest {
             ENGLISH
             FAIRY TALES
                         
-            COLLECTED BY
+            COLLECTED BY.
                         
             JOSEPH JACOBS
             HOW TO GET INTO THIS BOOK.
                         
                      Knock at the Knocker on the Door,
-                     Pull the Bell at the side
+                     Pull the Bell at the side.
                         
             """;
 
@@ -57,5 +59,20 @@ public class ProcessParagraphPDFTest {
         var paragraphs = processParagraph.getParagraphs(textTC3, paragraphFormatsExtra);
 
         assertEquals(6, paragraphs.size());
+    }
+
+    @Test
+    @Disabled
+    void testGetParagraphsWithOneJumpSeparatorDontDropFinalDot() {
+        var sentenceList = List.of(new Sentence(0, "This is the third boring story"));
+        var sentences = new LinkedList<>(sentenceList);
+        var paragraphFormatsExtra = new ParagraphFormats(2.0f, true, ParagraphSeparator.ONE_JUMP_WITH_SPACE);
+        given(sentenceSegmentator.createSentences(anyString(), any())).willReturn(sentences);
+
+        processParagraph.getParagraphs(textTC3, paragraphFormatsExtra);
+
+        verify(sentenceSegmentator).createSentences("\n" +
+                "JOSEPH JACOBS\n" +
+                "HOW TO GET INTO THIS BOOK.", SentenceLength.LARGE);
     }
 }
