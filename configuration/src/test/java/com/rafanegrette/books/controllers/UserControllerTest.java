@@ -3,6 +3,9 @@ package com.rafanegrette.books.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rafanegrette.books.model.User;
 import com.rafanegrette.books.npl.config.ModelSegmentSentence;
+import com.rafanegrette.books.service.UserSecuritySocial;
+import com.rafanegrette.books.services.CreateUserService;
+import com.rafanegrette.books.services.UserSecurityService;
 import com.rafanegrette.books.wavtovec.config.OpenAIConfiguration;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -19,6 +22,7 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -35,39 +39,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
+@WebMvcTest
 @ActiveProfiles("prod")
-@TestPropertySource(properties = {
-        "azure.host=val1",
-        "azure.path=val2",
-        "azure.key=val3",
-        "azure.format=val4",
-        "azure.contentType=val5",
-        "aws.bucketName=val6",
-        "aws.region=local",
-        "openai.authorization=textJDKLWJFK",
-        "openai.host=https://localhost.com",
-        "openai.path=/api/audio",
-        "openai.model=whiper",
-        "openai.responseformat=text",
-        "openai.language=en",
-        "openai.temperature=0.8",
-        "frontend.url=http://localhost",
-        "spring.security.oauth2.client.registration.google.client-id=fdkslfdm",
-        "spring.security.oauth2.client.registration.google.client-secret=sfjkdslfj"})
+@ContextConfiguration(classes = {UserController.class, UserSecuritySocial.class})
 class UserControllerTest {
 
     @Autowired
     MockMvc mockMvc;
 
     @MockBean
-    DynamoDbClient dynamoDbClient;
-
-    @MockBean(name ="webClientOpenAI")
-    WebClient webClient;
-
-    @MockBean
-    ModelSegmentSentence modelSegmentSentence;
+    CreateUserService createUserService;
 
     @Test
     void loggedUserSuccess() throws Exception {

@@ -1,0 +1,12 @@
+dependencies {
+    implementation project(':application')
+    implementation project(':adapters:audio-save-files')
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.12.0'
+
+    testImplementation project(':test-data')
+    testImplementation('org.mockito:mockito-junit-jupiter')
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "com.github.tomakehurst:wiremock-standalone:3.0.1"
+}

@@ -1,0 +1,29 @@
+package com.rafanegrette.books.services.audioprocess.conf;
+
+import com.rafanegrette.books.services.audioprocess.OpenAiSpeechService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.function.Consumer;
+
+@Configuration("OpenAiConfigurationAudio")
+public class OpenAiConfiguration {
+
+    private final OpenAIAudioParameters parameters;
+
+    public OpenAiConfiguration(OpenAIAudioParameters parameters) {
+        this.parameters = parameters;
+    }
+    @Bean("WebClientAudioOpenAi")
+    @Qualifier("WebClientAudioOpenAi")
+    WebClient webClientOpenAI(WebClient.Builder builder) {
+
+        return WebClient.builder()
+                .baseUrl(parameters.getHost() + parameters.getPath())
+                .defaultHeader("Authorization", "Bearer " + parameters.getAuthorization())
+                .build();
+    }
+}

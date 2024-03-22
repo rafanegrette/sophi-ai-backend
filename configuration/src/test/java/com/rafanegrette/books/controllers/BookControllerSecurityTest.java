@@ -5,14 +5,19 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.rafanegrette.books.npl.config.ModelSegmentSentence;
 import com.rafanegrette.books.repositories.BookRepositoryDynamo;
+import com.rafanegrette.books.repositories.entities.TitleImpl;
+import com.rafanegrette.books.services.ReadBookDBService;
+import com.rafanegrette.books.services.ReadBookService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.core.OAuth2UserCode;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -20,6 +25,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -42,42 +48,16 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@WebMvcTest
 @AutoConfigureMockMvc
-@TestPropertySource(properties = {
-        "azure.host=val1",
-        "azure.path=val2",
-        "azure.key=val3",
-        "azure.format=val4",
-        "azure.contentType=val5",
-        "aws.bucketName=val6",
-        "aws.region=local",
-        "openai.authorization=textJDKLWJFK",
-        "openai.host=https://localhost.com",
-        "openai.path=/api/audio",
-        "openai.model=whiper",
-        "openai.responseformat=text",
-        "openai.language=en",
-        "openai.temperature=0.8",
-        "frontend.url=http://localhost",
-        "spring.security.oauth2.client.registration.google.client-id=fdkslfdm",
-        "spring.security.oauth2.client.registration.google.client-secret=sfjkdslfj"})
+@ContextConfiguration(classes = {BookController.class})
 public class BookControllerSecurityTest {
-
-    /*@Autowired
-    JwtEncoder jwtEncoder;*/
 
     @Autowired
     private MockMvc mvc;
 
     @MockBean
-    DynamoDbClient dynamoDbClient;
-
-    @MockBean
-    BookRepositoryDynamo bookRepositoryDynamo;
-
-    @MockBean
-    ModelSegmentSentence modelSegmentSentence;
+    ReadBookDBService readBookService;
 
     @Test
     void shouldNotAllowTokenWithInvalidAudience() throws Exception {
@@ -93,8 +73,9 @@ public class BookControllerSecurityTest {
     @WithMockUser("username = Ralphy")
     void shouldAllowTokenSuccess() throws Exception {
         //String token = mint(claims -> claims.audience(List.of("user")));
-        when(bookRepositoryDynamo.findTitlesBy()).thenReturn(new ArrayList<>());
-        this.mvc.perform(get("/books/titles"))
+        when(readBookService.getAllTitles()).thenReturn(List.of(new TitleImpl("1", "book 1", "the end")));
+        this.mvc.perform(get("/books/titles")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
