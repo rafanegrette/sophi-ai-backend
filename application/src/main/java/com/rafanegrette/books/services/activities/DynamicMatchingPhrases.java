@@ -1,4 +1,4 @@
-package com.rafanegrette.books.services;
+package com.rafanegrette.books.services.activities;
 
 import java.util.LinkedList;
 

@@ -1,4 +1,4 @@
-package com.rafanegrette.books.services;
+package com.rafanegrette.books.services.activities;
 
 import com.rafanegrette.books.model.ListeningSentenceRequest;
 import com.rafanegrette.books.model.ListeningSentenceResponse;
@@ -11,9 +11,9 @@ import java.util.LinkedList;
 @RequiredArgsConstructor
 @Slf4j
 @Service
-public class ListeningWriteService extends DynamicMatchingPhrases<Character> {
+public class DictationService extends DynamicMatchingPhrases<Character> {
 
-    private final BookUserStateService bookUserStateService;
+    private final WriteBookUserStateService bookUserStateService;
 
     public ListeningSentenceResponse updateStatus(String userEmail,
                                                   ListeningSentenceRequest listeningSentenceRequest) {

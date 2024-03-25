@@ -1,47 +1,47 @@
 package com.rafanegrette.books.repositories;
 
-import com.rafanegrette.books.model.BookWriteState;
-import com.rafanegrette.books.repositories.entities.BookWriteStateDyna;
-import com.rafanegrette.books.repositories.entities.UserBookWriteStateDyna;
-import com.rafanegrette.books.repositories.entities.UserDyna;
+import com.rafanegrette.books.model.BookCurrentState;
+import com.rafanegrette.books.repositories.entities.BookStateDyna;
+import com.rafanegrette.books.repositories.entities.UserBookReadStateDyna;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
-import software.amazon.awssdk.enhanced.dynamodb.Key;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class BookUserStateDynamoTest {
+class ReadBookUserStateDynamoTest {
 
     @InjectMocks
-    BookUserStateDynamo bookUserStateDynamo;
+    ReadBookUserStateDynamo readBookUserStateDynamo;
 
     @Mock
-    DynamoDbTable<UserBookWriteStateDyna> bookUserStateTable;
+    DynamoDbTable<UserBookReadStateDyna> bookUserStateTable;
 
     @Test
     void saveUpdating() {
         // given
-        var bookUserState = new BookWriteState("4d5sdd4f5f", 0, 2, 3,0, false);
+        var bookUserState = new BookCurrentState("4d5sdd4f5f", 0, 2, 3,0, false);
         var userEmail = "fulanio@gmail.com";
-        var bookWriteStateDyna = new BookWriteStateDyna("4d5sdd4f5f", 0, 2, 3,0, false);
+        var bookWriteStateDyna = new BookStateDyna("4d5sdd4f5f", 0, 2, 3,0, false);
         //var bookUserStateDyna = new UserBookWriteStateDyna(userEmail, List.of(bookWriteStateDyna));
-        given(bookUserStateTable.getItem(any(Consumer.class))).willReturn(new UserBookWriteStateDyna(userEmail, new ArrayList<>()));
+        given(bookUserStateTable.getItem(any(Consumer.class))).willReturn(new UserBookReadStateDyna(userEmail, new ArrayList<>()));
 
         // when
-        bookUserStateDynamo.save(userEmail, bookUserState);
+        readBookUserStateDynamo.create(userEmail, bookUserState);
 
         // then
        verify(bookUserStateTable, times(1)).updateItem(any(Consumer.class));
@@ -50,14 +50,14 @@ class BookUserStateDynamoTest {
     @Test
     void saveCreatingNewRegistry() {
         // given
-        var bookUserState = new BookWriteState("4d5sdd4f5f", 0, 2, 3,0, false);
+        var bookUserState = new BookCurrentState("4d5sdd4f5f", 0, 2, 3,0, false);
         var userEmail = "fulanio@gmail.com";
-        var bookWriteStateDyna = new BookWriteStateDyna("4d5sdd4f5f", 0, 2, 3,0, false);
+        var bookWriteStateDyna = new BookStateDyna("4d5sdd4f5f", 0, 2, 3,0, false);
         //var bookUserStateDyna = new UserBookWriteStateDyna(userEmail, List.of(bookWriteStateDyna));
         //given(bookUserStateTable.getItem(any(Consumer.class))).willReturn(new UserBookWriteStateDyna(userEmail, new ArrayList<>()));
 
         // when
-        bookUserStateDynamo.save(userEmail, bookUserState);
+        readBookUserStateDynamo.create(userEmail, bookUserState);
 
         // then
         verify(bookUserStateTable, times(1)).updateItem(any(Consumer.class));
@@ -69,11 +69,11 @@ class BookUserStateDynamoTest {
         var userId = "fulano@gmail.com";
         var bookId = "dskljkhjfkhv7dsf";
         given(bookUserStateTable.getItem(any(Consumer.class)))
-                .willReturn(new UserBookWriteStateDyna(userId,
-                        List.of(new BookWriteStateDyna(bookId, 2, 1, 1,1, false))));
+                .willReturn(new UserBookReadStateDyna(userId,
+                        List.of(new BookStateDyna(bookId, 2, 1, 1,1, false))));
 
         // when||
-        var bookWriteState = bookUserStateDynamo.getState(userId, bookId);
+        var bookWriteState = readBookUserStateDynamo.getState(userId, bookId);
 
         //then
 
@@ -86,12 +86,26 @@ class BookUserStateDynamoTest {
     }
 
     @Test
-    void saveBookWriteState() {
+    void updateBookReadState() {
         var userId = "fulano@gmail.com";
         var bookId = "dskljkhjfkhv7dsf";
-        BookWriteState bookWriteState = new BookWriteState(bookId, 0, 0,1,1, false);
-        bookUserStateDynamo.saveState(userId, bookWriteState);
+        BookCurrentState bookCurrentState = new BookCurrentState(bookId, 0, 0,1,1, false);
+        readBookUserStateDynamo.saveState(userId, bookCurrentState);
 
         verify(bookUserStateTable).updateItem(any(Consumer.class));
+    }
+
+
+    // TODO the data structure should change, it should be {userEmail, bookDyna} not {userEmail, List<bookDyna>}
+    @Test
+    @Disabled
+    void deleteBookReadState() {
+        var userId = "fulano@gmail.com";
+        var bookId = "dskljkhjfkhv7dsf";
+        BookCurrentState bookCurrentState = new BookCurrentState(bookId, 0, 0,1,1, false);
+        //given(bookUserStateTable.query(any())).willReturn()
+        readBookUserStateDynamo.delete(bookId);
+
+        verify(bookUserStateTable).deleteItem(any(Consumer.class));
     }
 }

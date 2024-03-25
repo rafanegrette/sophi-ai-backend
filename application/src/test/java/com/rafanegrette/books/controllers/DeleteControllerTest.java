@@ -31,6 +31,6 @@ class DeleteControllerTest {
                         //.with(csrf()))
                 )
                 .andExpect(status().isOk());
-        verify(deleteBookService, times(1)).deleteBook("Harry-1");
+        verify(deleteBookService).deleteBook("Harry-1");
     }
 }

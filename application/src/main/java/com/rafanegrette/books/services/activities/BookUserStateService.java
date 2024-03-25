@@ -1,21 +1,22 @@
-package com.rafanegrette.books.services;
+package com.rafanegrette.books.services.activities;
 
 import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.port.out.BookUserStateRepository;
+import com.rafanegrette.books.services.ReadBookService;
+import com.rafanegrette.books.services.UserSecurityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @RequiredArgsConstructor
-@Service
-public class BookUserStateService {
+abstract class BookUserStateService {
 
     private final BookUserStateRepository bookUserStateRepository;
     private final UserSecurityService userSecurityService;
     private final ReadBookService readBookService;
 
-    public BookWriteState getState(String bookId) {
+    public BookCurrentState getState(String bookId) {
         var userId = userSecurityService.getUser().email();
 
         return bookUserStateRepository.getState(userId,bookId);
@@ -28,15 +29,15 @@ public class BookUserStateService {
         bookUserStateRepository.saveState(userId, newBookState);
     }
 
-    private BookWriteState updateState(BookWriteState bookWriteState) {
-        var book = readBookService.getBook(bookWriteState.bookId()).orElseThrow(BookNotFoundException::new);
-        if (isFinished(bookWriteState, book)) {
-            return finishedReadBookWriteState(bookWriteState);
+    private BookCurrentState updateState(BookCurrentState bookCurrentState) {
+        var book = readBookService.getBook(bookCurrentState.bookId()).orElseThrow(BookNotFoundException::new);
+        if (isFinished(bookCurrentState, book)) {
+            return finishedReadBookWriteState(bookCurrentState);
         }
-        return increaseState(bookWriteState, book);
+        return increaseState(bookCurrentState, book);
     }
 
-    private boolean isFinished(BookWriteState currentState, Book book) {
+    private boolean isFinished(BookCurrentState currentState, Book book) {
         var bookLastChapter = book.chapters().getLast();
         var bookLastPage = bookLastChapter.pages().getLast();
         var bookLastParagraph = bookLastPage.paragraphs().getLast();
@@ -48,23 +49,23 @@ public class BookUserStateService {
     }
 
 
-    private BookWriteState increaseState(BookWriteState bookWriteState, Book book) {
-        var nextSentenceId = Optional.ofNullable(getNextSentenceId(book, bookWriteState));
+    private BookCurrentState increaseState(BookCurrentState bookCurrentState, Book book) {
+        var nextSentenceId = Optional.ofNullable(getNextSentenceId(book, bookCurrentState));
         if (nextSentenceId.isPresent()) {
-            return writeStateSentence(nextSentenceId.get(), bookWriteState);
+            return writeStateSentence(nextSentenceId.get(), bookCurrentState);
         }
-        var nextParagraph = Optional.ofNullable(getNextParagraphId(book, bookWriteState));
+        var nextParagraph = Optional.ofNullable(getNextParagraphId(book, bookCurrentState));
         if (nextParagraph.isPresent()) {
-            return writeStateParagraph(nextParagraph.get(), bookWriteState);
+            return writeStateParagraph(nextParagraph.get(), bookCurrentState);
         }
 
-        var nextPage = Optional.ofNullable(getNextPageId(book, bookWriteState));
+        var nextPage = Optional.ofNullable(getNextPageId(book, bookCurrentState));
         if (nextPage.isPresent()) {
-            return writeStatePage(nextPage.get(), bookWriteState);
+            return writeStatePage(nextPage.get(), bookCurrentState);
         }
 
-        var nextChapter = Optional.ofNullable(getNextChapterId(book, bookWriteState.chapterId())).orElseThrow();
-        return new BookWriteState(bookWriteState.bookId(),
+        var nextChapter = Optional.ofNullable(getNextChapterId(book, bookCurrentState.chapterId())).orElseThrow();
+        return new BookCurrentState(bookCurrentState.bookId(),
                 nextChapter.id(),
                 nextChapter.pages().get(0).number(),
                 nextChapter.pages().get(0).paragraphs().get(0).id(),
@@ -72,38 +73,38 @@ public class BookUserStateService {
                 false);
     }
 
-    private BookWriteState writeStatePage(Page page, BookWriteState bookWriteState) {
-        return new BookWriteState(bookWriteState.bookId(),
-                bookWriteState.chapterId(),
+    private BookCurrentState writeStatePage(Page page, BookCurrentState bookCurrentState) {
+        return new BookCurrentState(bookCurrentState.bookId(),
+                bookCurrentState.chapterId(),
                 page.number(),
                 page.paragraphs().get(0).id(),
                 page.paragraphs().get(0).sentences().get(0).id(),
                 false);
     }
 
-    private BookWriteState writeStateParagraph(Paragraph paragraph, BookWriteState bookWriteState) {
-        return new BookWriteState(bookWriteState.bookId(),
-                bookWriteState.chapterId(),
-                bookWriteState.pageNo(),
+    private BookCurrentState writeStateParagraph(Paragraph paragraph, BookCurrentState bookCurrentState) {
+        return new BookCurrentState(bookCurrentState.bookId(),
+                bookCurrentState.chapterId(),
+                bookCurrentState.pageNo(),
                 paragraph.id(),
                 paragraph.sentences().get(0).id(),
                 false);
     }
 
-    private BookWriteState finishedReadBookWriteState(BookWriteState bookWriteState) {
-        return new BookWriteState(bookWriteState.bookId(),
-                bookWriteState.chapterId(),
-                bookWriteState.pageNo(),
-                bookWriteState.paragraphId(),
-                bookWriteState.sentenceId(),
+    private BookCurrentState finishedReadBookWriteState(BookCurrentState bookCurrentState) {
+        return new BookCurrentState(bookCurrentState.bookId(),
+                bookCurrentState.chapterId(),
+                bookCurrentState.pageNo(),
+                bookCurrentState.paragraphId(),
+                bookCurrentState.sentenceId(),
                 true);
     }
 
-    private BookWriteState writeStateSentence(Integer sentenceId, BookWriteState bookWriteState) {
-        return new BookWriteState(bookWriteState.bookId(),
-                bookWriteState.chapterId(),
-                bookWriteState.pageNo(),
-                bookWriteState.paragraphId(),
+    private BookCurrentState writeStateSentence(Integer sentenceId, BookCurrentState bookCurrentState) {
+        return new BookCurrentState(bookCurrentState.bookId(),
+                bookCurrentState.chapterId(),
+                bookCurrentState.pageNo(),
+                bookCurrentState.paragraphId(),
                 sentenceId,
                 false);
     }
@@ -119,51 +120,51 @@ public class BookUserStateService {
         return null;
     }
 
-    private Page getNextPageId(Book book, BookWriteState bookWriteState) {
+    private Page getNextPageId(Book book, BookCurrentState bookCurrentState) {
         var pages = book.chapters()
                 .stream()
-                .filter(c -> c.id().equals(bookWriteState.chapterId()))
+                .filter(c -> c.id().equals(bookCurrentState.chapterId()))
                 .flatMap(c -> c.pages().stream())
                 .toList();
 
         for (int i = 0; i < pages.size() - 1; i++) {
-            if (pages.get(i).number().equals(bookWriteState.pageNo())) {
+            if (pages.get(i).number().equals(bookCurrentState.pageNo())) {
                 return pages.get(i + 1);
             }
         }
         return null;
     }
 
-    private Paragraph getNextParagraphId(Book book, BookWriteState bookWriteState) {
+    private Paragraph getNextParagraphId(Book book, BookCurrentState bookCurrentState) {
         var paragraph = book.chapters()
                 .stream()
-                .filter(c -> c.id().equals(bookWriteState.chapterId()))
+                .filter(c -> c.id().equals(bookCurrentState.chapterId()))
                 .flatMap(c -> c.pages().stream())
-                .filter(p -> p.number().equals(bookWriteState.pageNo()))
+                .filter(p -> p.number().equals(bookCurrentState.pageNo()))
                 .flatMap(p -> p.paragraphs().stream())
                 .toList();
 
         for (int i = 0; i < paragraph.size() - 1; i++) {
-            if (paragraph.get(i).id().equals(bookWriteState.paragraphId())) {
+            if (paragraph.get(i).id().equals(bookCurrentState.paragraphId())) {
                 return paragraph.get(i + 1);
             }
         }
         return null;
     }
 
-    private Integer getNextSentenceId(Book book, BookWriteState bookWriteState) {
+    private Integer getNextSentenceId(Book book, BookCurrentState bookCurrentState) {
         var sentences = book.chapters()
                 .stream()
-                .filter(c -> c.id().equals(bookWriteState.chapterId()))
+                .filter(c -> c.id().equals(bookCurrentState.chapterId()))
                 .flatMap(c -> c.pages().stream())
-                .filter(p -> p.number().equals(bookWriteState.pageNo()))
+                .filter(p -> p.number().equals(bookCurrentState.pageNo()))
                 .flatMap(p -> p.paragraphs().stream())
-                .filter(p -> p.id().equals(bookWriteState.paragraphId()))
+                .filter(p -> p.id().equals(bookCurrentState.paragraphId()))
                 .flatMap(p -> p.sentences().stream())
                 .toList();
 
         for (int i = 0; i < sentences.size() - 1; i++) {
-            if (sentences.get(i).id().equals(bookWriteState.sentenceId())) {
+            if (sentences.get(i).id().equals(bookCurrentState.sentenceId())) {
                 return sentences.get(i + 1).id();
             }
         }

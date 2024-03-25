@@ -1,11 +1,11 @@
 package com.rafanegrette.books.repositories;
 
-import com.rafanegrette.books.model.BookWriteState;
-import com.rafanegrette.books.port.out.BookUserStateRepository;
-import com.rafanegrette.books.port.out.SaveBookUserStateRepository;
-import com.rafanegrette.books.repositories.entities.BookWriteStateDyna;
+import com.rafanegrette.books.model.BookCurrentState;
+import com.rafanegrette.books.port.out.DeleteBookStateService;
+import com.rafanegrette.books.port.out.WriteBookUserStateRepository;
+import com.rafanegrette.books.repositories.entities.BookStateDyna;
 import com.rafanegrette.books.repositories.entities.UserBookWriteStateDyna;
-import com.rafanegrette.books.repositories.mappers.BookWriteStateMapper;
+import com.rafanegrette.books.repositories.mappers.BookStateMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
@@ -15,43 +15,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Repository
-public class BookUserStateDynamo implements SaveBookUserStateRepository, BookUserStateRepository {
+@Repository("WriteBookUserStateDynamo")
+public class WriteBookUserStateDynamo implements WriteBookUserStateRepository, DeleteBookStateService {
 
 
     private final DynamoDbTable<UserBookWriteStateDyna> bookUserStateTable;
 
     @Override
-    public void save(String userEmail, BookWriteState bookWriteState) {
+    public void create(String userEmail, BookCurrentState bookCurrentState) {
 
 
         var userWriteState = getUserWriteState(userEmail);
-        var bookWriteStateDyna = BookWriteStateMapper.INSTANCE.map(bookWriteState);
+        var bookWriteStateDyna = BookStateMapper.INSTANCE.map(bookCurrentState);
         addBookWriteStateDyna(userWriteState, bookWriteStateDyna);
         bookUserStateTable.updateItem(r -> r.item(userWriteState));
     }
 
     @Override
-    public BookWriteState getState(String userId, String bookId) {
+    public BookCurrentState getState(String userId, String bookId) {
 
         var userWriteState = getUserWriteState(userId);
 
-        return userWriteState.getBookWriteStateDynas()
+        return userWriteState.getBookStateDynas()
                 .stream()
                 .filter(s -> s.getBookId().equals(bookId))
-                .map(BookWriteStateMapper.INSTANCE::map)
+                .map(BookStateMapper.INSTANCE::map)
                 .findFirst()
                 .orElseThrow();
     }
 
     @Override
-    public void saveState(String userId, BookWriteState bookWriteState) {
+    public void saveState(String userId, BookCurrentState bookCurrentState) {
         var userWriteState = getUserWriteState(userId);
-        var bookWriteStateDyna = BookWriteStateMapper.INSTANCE.map(bookWriteState);
-        List<BookWriteStateDyna> newUserBookList = new ArrayList<>();
-        userWriteState.getBookWriteStateDynas()
+        var bookWriteStateDyna = BookStateMapper.INSTANCE.map(bookCurrentState);
+        List<BookStateDyna> newUserBookList = new ArrayList<>();
+        userWriteState.getBookStateDynas()
                 .forEach(rb -> {
-                    if (rb.getBookId().equals(bookWriteState.bookId())) {
+                    if (rb.getBookId().equals(bookCurrentState.bookId())) {
                         newUserBookList.add(bookWriteStateDyna);
                     } else {
                         newUserBookList.add(rb);
@@ -74,12 +74,16 @@ public class BookUserStateDynamo implements SaveBookUserStateRepository, BookUse
         return userWriteState;
     }
 
-    private void addBookWriteStateDyna(UserBookWriteStateDyna userBookWriteStateDyna, BookWriteStateDyna bookWriteStateDyna) {
-        if (userBookWriteStateDyna.getBookWriteStateDynas() == null) {
-            userBookWriteStateDyna.setBookWriteStateDynas(new ArrayList<>());
+    private void addBookWriteStateDyna(UserBookWriteStateDyna userBookWriteStateDyna, BookStateDyna bookStateDyna) {
+        if (userBookWriteStateDyna.getBookStateDynas() == null) {
+            userBookWriteStateDyna.setBookStateDynas(new ArrayList<>());
         }
-        userBookWriteStateDyna.getBookWriteStateDynas().add(bookWriteStateDyna);
+        userBookWriteStateDyna.getBookStateDynas().add(bookStateDyna);
     }
 
 
+    @Override
+    public void delete(String bookId) {
+
+    }
 }

@@ -10,7 +10,7 @@ import java.io.Serializable;
 @DynamoDbBean
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookWriteStateDyna implements Serializable {
+public class BookStateDyna implements Serializable {
 
     String bookId;
 

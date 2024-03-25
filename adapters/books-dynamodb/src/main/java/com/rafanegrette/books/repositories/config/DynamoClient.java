@@ -62,6 +62,7 @@ public class DynamoClient {
 
 	private void createUserBookWriteStateTable(DynamoDbClient dynamoDbClient) {
 		createTable(dynamoDbClient, "UserBookWriteState", "userEmail");
+		createTable(dynamoDbClient, "UserBookReadState", "userEmail");
 	}
 
 	private void createTable(DynamoDbClient dynamoDbClient, String tableName, String id) {

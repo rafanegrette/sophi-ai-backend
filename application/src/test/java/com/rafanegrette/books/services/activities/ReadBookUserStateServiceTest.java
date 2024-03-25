@@ -1,9 +1,11 @@
-package com.rafanegrette.books.services;
+package com.rafanegrette.books.services.activities;
 
-import com.rafanegrette.books.model.BookWriteState;
+import com.rafanegrette.books.model.BookCurrentState;
 import com.rafanegrette.books.model.User;
 import com.rafanegrette.books.model.mother.BookMother;
-import com.rafanegrette.books.port.out.BookUserStateRepository;
+import com.rafanegrette.books.port.out.ReadBookUserStateRepository;
+import com.rafanegrette.books.services.ReadBookService;
+import com.rafanegrette.books.services.UserSecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,18 +15,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class BookUserStateServiceTest {
+class ReadBookUserStateServiceTest {
 
     @InjectMocks
-    BookUserStateService bookUserStateService;
+    ReadBookUserStateService readBookUserStateService;
     @Mock
-    BookUserStateRepository bookUserStateRepository;
+    ReadBookUserStateRepository bookUserStateRepository;
     @Mock
     UserSecurityService userSecurityService;
 
@@ -41,15 +42,14 @@ class BookUserStateServiceTest {
     }
 
     @Test
-    void getState() {
+    void getWriteState() {
 
         // given
 
-
         given(bookUserStateRepository.getState(userEmail, bookId))
-                .willReturn(new BookWriteState(bookId, 1,1,1,1, false));
+                .willReturn(new BookCurrentState(bookId, 1,1,1,1, false));
         // when
-        var writeBookState = bookUserStateService.getState(bookId);
+        var writeBookState = readBookUserStateService.getState(bookId);
         // then
 
         assertNotNull(writeBookState);
@@ -64,13 +64,13 @@ class BookUserStateServiceTest {
         var currentPage = currentChapter.pages().get(2);
         var currentParagraph = currentPage.paragraphs().get(2);
         var currentSentence = currentParagraph.sentences().get(0);
-        var bookState = new BookWriteState(book.id(),
+        var bookState = new BookCurrentState(book.id(),
                             currentChapter.id(),
                             currentPage.number(),
                             currentParagraph.id(),
                             currentSentence.id(),
                 false);
-        var bookStateExpected = new BookWriteState(book.id(),
+        var bookStateExpected = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
                 currentParagraph.id(),
@@ -81,7 +81,7 @@ class BookUserStateServiceTest {
         given(bookUserStateRepository.getState(userEmail, book.id())).willReturn(bookState);
 
         // when
-        bookUserStateService.advanceState(book.id());
+        readBookUserStateService.advanceState(book.id());
 
         // then
 
@@ -96,13 +96,13 @@ class BookUserStateServiceTest {
         var currentPage = currentChapter.pages().get(0);
         var currentParagraph = currentPage.paragraphs().get(0);
         var currentSentence = currentParagraph.sentences().get(0);
-        var bookState = new BookWriteState(book.id(),
+        var bookState = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
                 currentParagraph.id(),
                 currentSentence.id(),
                 false);
-        var bookStateExpected = new BookWriteState(book.id(),
+        var bookStateExpected = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
                 currentPage.paragraphs().get(1).id(),
@@ -113,7 +113,7 @@ class BookUserStateServiceTest {
         given(bookUserStateRepository.getState(userEmail, book.id())).willReturn(bookState);
 
         // when
-        bookUserStateService.advanceState(book.id());
+        readBookUserStateService.advanceState(book.id());
 
         // then
 
@@ -131,13 +131,13 @@ class BookUserStateServiceTest {
         var nextPage = currentChapter.pages().get(1);
         var nextParagraph = nextPage.paragraphs().get(0);
         var nextSentence = nextParagraph.sentences().get(0);
-        var bookState = new BookWriteState(book.id(),
+        var bookState = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
                 currentParagraph.id(),
                 currentSentence.id(),
                 false);
-        var bookStateExpected = new BookWriteState(book.id(),
+        var bookStateExpected = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 nextPage.number(),
                 nextParagraph.id(),
@@ -148,7 +148,7 @@ class BookUserStateServiceTest {
         given(bookUserStateRepository.getState(userEmail, book.id())).willReturn(bookState);
 
         // when
-        bookUserStateService.advanceState(book.id());
+        readBookUserStateService.advanceState(book.id());
 
         // then
         verify(bookUserStateRepository).saveState(userEmail, bookStateExpected);
@@ -166,13 +166,13 @@ class BookUserStateServiceTest {
         var nextPage = nextChapter.pages().get(0);
         var nextParagraph = nextPage.paragraphs().get(0);
         var nextSentence = nextParagraph.sentences().get(0);
-        var bookState = new BookWriteState(book.id(),
+        var bookState = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
                 currentParagraph.id(),
                 currentSentence.id(),
                 false);
-        var bookStateExpected = new BookWriteState(book.id(),
+        var bookStateExpected = new BookCurrentState(book.id(),
                 nextChapter.id(),
                 nextPage.number(),
                 nextParagraph.id(),
@@ -183,7 +183,7 @@ class BookUserStateServiceTest {
         given(bookUserStateRepository.getState(userEmail, book.id())).willReturn(bookState);
 
         // when
-        bookUserStateService.advanceState(book.id());
+        readBookUserStateService.advanceState(book.id());
 
         // then
         verify(bookUserStateRepository).saveState(userEmail, bookStateExpected);
@@ -199,13 +199,13 @@ class BookUserStateServiceTest {
         var currentParagraph = currentPage.paragraphs().get(2); // last paragraph
         var currentSentence = currentParagraph.sentences().get(0); // before last sentence
         var lastSentence = currentParagraph.sentences().get(1);
-        var bookState = new BookWriteState(book.id(),
+        var bookState = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
                 currentParagraph.id(),
                 currentSentence.id(),
                 false);
-        var bookStateExpected = new BookWriteState(book.id(),
+        var bookStateExpected = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
                 currentParagraph.id(),
@@ -215,7 +215,7 @@ class BookUserStateServiceTest {
         given(readBookService.getBook(book.id())).willReturn(Optional.of(book));
         given(bookUserStateRepository.getState(userEmail, book.id())).willReturn(bookState);
         // when
-        bookUserStateService.advanceState(book.id());
+        readBookUserStateService.advanceState(book.id());
         // then
         verify(bookUserStateRepository).saveState(userEmail, bookStateExpected);
     }
@@ -228,13 +228,13 @@ class BookUserStateServiceTest {
         var currentPage = currentChapter.pages().get(1); // last page
         var currentParagraph = currentPage.paragraphs().get(2); // last paragraph
         var lastSentence = currentParagraph.sentences().get(1);
-        var bookState = new BookWriteState(book.id(),
+        var bookState = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
                 currentParagraph.id(),
                 lastSentence.id(),
                 false);
-        var bookStateExpected = new BookWriteState(book.id(),
+        var bookStateExpected = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
                 currentParagraph.id(),
@@ -244,7 +244,7 @@ class BookUserStateServiceTest {
         given(readBookService.getBook(book.id())).willReturn(Optional.of(book));
         given(bookUserStateRepository.getState(userEmail, book.id())).willReturn(bookState);
         // when
-        bookUserStateService.advanceState(book.id());
+        readBookUserStateService.advanceState(book.id());
         // then
         verify(bookUserStateRepository).saveState(userEmail, bookStateExpected);
     }

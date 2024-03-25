@@ -1,14 +1,14 @@
 package com.rafanegrette.books.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rafanegrette.books.model.BookWriteState;
+import com.rafanegrette.books.model.BookCurrentState;
 import com.rafanegrette.books.model.ListeningSentenceRequest;
 import com.rafanegrette.books.model.ListeningSentenceResponse;
 import com.rafanegrette.books.model.User;
 import com.rafanegrette.books.model.mother.BookMother;
-import com.rafanegrette.books.services.BookUserStateService;
-import com.rafanegrette.books.services.ListeningWriteService;
+import com.rafanegrette.books.services.activities.DictationService;
 import com.rafanegrette.books.services.UserSecurityService;
+import com.rafanegrette.books.services.activities.WriteBookUserStateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,14 +23,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ListenerBookController.class)
-public class ListenerBookControllerTest {
+@WebMvcTest(DictationController.class)
+public class DictationBookControllerTest {
 
     @Autowired
     MockMvc mockMvc;
 
     @MockBean
-    ListeningWriteService listeningWriteService;
+    DictationService dictationService;
     @MockBean
     UserSecurityService userSecurityService;
 
@@ -38,14 +38,14 @@ public class ListenerBookControllerTest {
     static final String BOOK_ID = "sdfjkd34K99";
 
     @MockBean
-    BookUserStateService bookUserStateService;
+    WriteBookUserStateService bookUserStateService;
 
     @Test
     void getBookWriteState() throws Exception {
         // given
-        var bookWriteState = new BookWriteState(BOOK_ID, 1, 2, 0, 0, false);
+        var bookCurrentState = new BookCurrentState(BOOK_ID, 1, 2, 0, 0, false);
 
-        given(bookUserStateService.getState(BOOK_ID)).willReturn(bookWriteState);
+        given(bookUserStateService.getState(BOOK_ID)).willReturn(bookCurrentState);
 
         // when - then
 
@@ -70,7 +70,7 @@ public class ListenerBookControllerTest {
         var expectedText = "chapter twenty <mark>one</mark> the promise gift";
         // when
         when(userSecurityService.getUser()).thenReturn(new User("user", userEmail));
-        when(listeningWriteService.updateStatus(userEmail, request)).thenReturn(
+        when(dictationService.updateStatus(userEmail, request)).thenReturn(
                 new ListeningSentenceResponse(false, expectedText));
         // then
         mockMvc.perform(post("/listening", request)

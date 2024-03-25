@@ -1,4 +1,4 @@
-package com.rafanegrette.books.services;
+package com.rafanegrette.books.services.activities;
 
 import com.rafanegrette.books.port.out.SpeechToTextService;
 import lombok.extern.slf4j.Slf4j;

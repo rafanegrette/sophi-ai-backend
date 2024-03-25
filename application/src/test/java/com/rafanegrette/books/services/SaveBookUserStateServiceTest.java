@@ -1,16 +1,16 @@
 package com.rafanegrette.books.services;
 
-import com.rafanegrette.books.model.BookWriteState;
+import com.rafanegrette.books.model.BookCurrentState;
 import com.rafanegrette.books.model.User;
 import com.rafanegrette.books.model.mother.BookMother;
-import com.rafanegrette.books.port.out.SaveBookUserStateRepository;
+import com.rafanegrette.books.port.out.ReadBookUserStateRepository;
+import com.rafanegrette.books.port.out.WriteBookUserStateRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,8 +22,10 @@ class SaveBookUserStateServiceTest {
     SaveBookUserStateService saveBookUserStateService;
 
     @Mock
-    SaveBookUserStateRepository saveBookUserStateRepository;
+    WriteBookUserStateRepository writeBookUserStateRepository;
 
+    @Mock
+    ReadBookUserStateRepository readBookUserStateRepository;
     @Mock
     UserSecurityService userSecurityService;
 
@@ -32,7 +34,7 @@ class SaveBookUserStateServiceTest {
         // given
         var book = BookMother.harryPotter1().build();
         var userEmail = "fulanito@gmail.com";
-        var bookWriteState = new BookWriteState(book.id(),
+        var bookWriteState = new BookCurrentState(book.id(),
                 book.chapters().get(0).id(),
                 book.chapters().get(0).pages().get(0).number(),
                 book.chapters().get(0).pages().get(0).paragraphs().get(0).id(),
@@ -45,7 +47,8 @@ class SaveBookUserStateServiceTest {
 
 
         // then
-        verify(saveBookUserStateRepository, times(1)).save(userEmail, bookWriteState);
+        verify(writeBookUserStateRepository).create(userEmail, bookWriteState);
+        verify(readBookUserStateRepository).create(userEmail, bookWriteState);
     }
 
 }

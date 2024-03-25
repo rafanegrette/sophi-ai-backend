@@ -1,6 +1,6 @@
 package com.rafanegrette.books.repositories.config;
 
-import com.rafanegrette.books.repositories.entities.BookWriteStateDyna;
+import com.rafanegrette.books.repositories.entities.UserBookReadStateDyna;
 import com.rafanegrette.books.repositories.entities.UserBookWriteStateDyna;
 import com.rafanegrette.books.repositories.entities.UserDyna;
 import org.springframework.context.annotation.Bean;
@@ -36,5 +36,11 @@ public class DynamoDBConfig {
 	public DynamoDbTable<UserBookWriteStateDyna> configDynamoUserBookWriteStateDBTable() {
 		TableSchema<UserBookWriteStateDyna> userSchema = BeanTableSchema.create(UserBookWriteStateDyna.class);
 		return dynamoDbEnhancedClient.table("UserBookWriteState", userSchema);
+	}
+
+	@Bean
+	public DynamoDbTable<UserBookReadStateDyna> configDynamoUserBookReadStateDBTable() {
+		TableSchema<UserBookReadStateDyna> userSchema = BeanTableSchema.create(UserBookReadStateDyna.class);
+		return dynamoDbEnhancedClient.table("UserBookReadState", userSchema);
 	}
 }

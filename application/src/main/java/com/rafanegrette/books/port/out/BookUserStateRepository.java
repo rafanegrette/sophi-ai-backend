@@ -1,10 +1,11 @@
 package com.rafanegrette.books.port.out;
 
-import com.rafanegrette.books.model.BookWriteState;
+import com.rafanegrette.books.model.BookCurrentState;
 
 public interface BookUserStateRepository {
 
-    BookWriteState getState(String userId, String bookId);
+    BookCurrentState getState(String userId, String bookId);
 
-    void saveState(String userId, BookWriteState bookWriteState);
+    void saveState(String userId, BookCurrentState bookCurrentState);
+    void create(String userId, BookCurrentState bookCurrentState);
 }

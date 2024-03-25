@@ -1,6 +1,8 @@
-package com.rafanegrette.books.services;
+package com.rafanegrette.books.services.activities;
 
 import com.rafanegrette.books.port.out.SpeechToTextService;
+import com.rafanegrette.books.services.activities.VoiceMatchingPhrases;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -186,4 +188,19 @@ class VoiceMatchingServiceTest {
         assertEquals(expectedText, result);
     }
 
+    @Test
+    @Disabled
+    void testMatchWithHyphen() {
+        var file = "Any binary, actually we don't need to test the format here".getBytes();
+        var originalText = "the hen-houses";
+        var transcribedText = "the hen houses";
+        var expectedText = "the hen-houses";
+
+        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        // when
+        var result = voiceMatchingService.process(file, originalText);
+
+        // then
+        assertEquals(expectedText, result);
+    }
 }

@@ -1,4 +1,4 @@
-package com.rafanegrette.books.services;
+package com.rafanegrette.books.services.activities;
 
 import com.rafanegrette.books.model.ListeningSentenceRequest;
 import com.rafanegrette.books.model.mother.BookMother;
@@ -13,13 +13,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class ListeningWriteServiceTest {
+class DictationServiceTest {
 
     @InjectMocks
-    ListeningWriteService listeningWriteService;
+    DictationService dictationService;
 
     @Mock
-    BookUserStateService bookUserStateService;
+    WriteBookUserStateService writeBookUserStateService;
 
     @Test
     void updateStatusBookSuccess() {
@@ -30,12 +30,12 @@ class ListeningWriteServiceTest {
         var userEmail = "ethusertest@gmail.com";
         var request = new ListeningSentenceRequest(bookId, userText, bookText);
         // When
-        var response = listeningWriteService.updateStatus(userEmail, request);
+        var response = dictationService.updateStatus(userEmail, request);
         // Then
         assertNotNull(response);
         assertTrue(response.accepted());
         assertEquals(bookText, response.result());
-        verify(bookUserStateService).advanceState(bookId);
+        verify(writeBookUserStateService).advanceState(bookId);
     }
 
     @Test
@@ -48,7 +48,7 @@ class ListeningWriteServiceTest {
         var userEmail = "ethusertest@gmail.com";
         var request = new ListeningSentenceRequest(bookId, userText, bookText);
         // When
-        var response = listeningWriteService.updateStatus(userEmail, request);
+        var response = dictationService.updateStatus(userEmail, request);
         // Then
         assertNotNull(response);
         assertFalse(response.accepted());
@@ -65,7 +65,7 @@ class ListeningWriteServiceTest {
         var userEmail = "ethusertest@gmail.com";
         var request = new ListeningSentenceRequest(bookId, userText, bookText);
         // When
-        var response = listeningWriteService.updateStatus(userEmail, request);
+        var response = dictationService.updateStatus(userEmail, request);
         // Then
         assertNotNull(response);
         assertFalse(response.accepted());
@@ -81,7 +81,7 @@ class ListeningWriteServiceTest {
         var userEmail = "ethusertest@gmail.com";
         var request = new ListeningSentenceRequest(bookId, userText, bookText);
         // When
-        var response = listeningWriteService.updateStatus(userEmail, request);
+        var response = dictationService.updateStatus(userEmail, request);
         // Then
         assertNotNull(response);
         assertTrue(response.accepted());
@@ -98,7 +98,7 @@ class ListeningWriteServiceTest {
         var request = new ListeningSentenceRequest(bookId, userText, bookText);
 
         // When
-        var response = listeningWriteService.updateStatus(userEmail, request);
+        var response = dictationService.updateStatus(userEmail, request);
 
         // Then
 
@@ -118,7 +118,7 @@ class ListeningWriteServiceTest {
         var request = new ListeningSentenceRequest(bookId, userText, bookText);
 
         // When
-        var response = listeningWriteService.updateStatus(userEmail, request);
+        var response = dictationService.updateStatus(userEmail, request);
 
         // Then
 
@@ -137,7 +137,7 @@ class ListeningWriteServiceTest {
         var request = new ListeningSentenceRequest(bookId, userText, bookText);
 
         // When
-        var response = listeningWriteService.updateStatus(userEmail, request);
+        var response = dictationService.updateStatus(userEmail, request);
 
         // Then
 
