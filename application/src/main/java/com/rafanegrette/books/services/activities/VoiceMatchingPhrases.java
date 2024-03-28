@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
+import java.util.stream.Stream;
 
 import static java.lang.Math.max;
 
@@ -15,14 +16,16 @@ public class VoiceMatchingPhrases extends DynamicMatchingPhrases<String> {
 
     private final SpeechToTextService speechToTextService;
     private static final String REGEX_SPLIT_WORDS = "(?<=\\S)(?=\\s)|(?<=\\s)(?=\\S)";
+    //private static final String REGEX_SPLIT_WORDS = "(?=\\s)";
     public VoiceMatchingPhrases(@Qualifier("WhisperService") SpeechToTextService speechToTextService) {
         this.speechToTextService = speechToTextService;
     }
 
     public String process(byte[] file, String originalText) {
         var transcribed = speechToTextService.wavToVec(file);
-
-        return getMatched(originalText.split(REGEX_SPLIT_WORDS), transcribed.split(REGEX_SPLIT_WORDS));
+        var originalSpaceStriped = Stream.of(originalText.split(REGEX_SPLIT_WORDS)).map(String::trim).filter(s -> !s.isEmpty()).toArray(String[]::new);
+        var transcribedStriped = Stream.of(transcribed.split(REGEX_SPLIT_WORDS)).map(String::trim).filter(s -> !s.isEmpty()).toArray(String[]::new);
+        return getMatched(originalSpaceStriped, transcribedStriped);
     }
 
     @Override
@@ -46,6 +49,11 @@ public class VoiceMatchingPhrases extends DynamicMatchingPhrases<String> {
                     if(!transcribedWords[i - 1].isBlank()) words.offer("~~" + transcribedWords[i - 1].replace("\n","") + "~~");
                     i--;
                 }
+                // add space
+                if (i > 0 || j > 0) {
+                    words.offer(" ");
+                }
+
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             log.error("Error ArrayIndexOut, original: {}, transcribed: {}", originalWords, transcribedWords);

@@ -15,6 +15,8 @@ public class BookMother {
                 .id("Harry-1")
                 .label("Harry-1")
                 .title("Harry Potter and the Sorcerer's Stone")
+                .contentTable(List.of(new ContentIndex(0, "Chapter 1", null, null, 1),
+                        new ContentIndex(1, "Chapter 1", null, null, 2)))
                 .chapters(List.of(ChapterMother.potterChapter1().build(),
                         ChapterMother.potterChapter2().build()));
     }

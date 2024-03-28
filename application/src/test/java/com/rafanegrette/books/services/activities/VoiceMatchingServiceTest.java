@@ -129,7 +129,7 @@ class VoiceMatchingServiceTest {
         var file = "Any binary, actually we don't need to test the format here".getBytes();
         var originalText = "gigantic. ";
         var transcribedText = "Gigantic waterfall\n";
-        var expectedText = "gigantic. ~~waterfall~~";
+        var expectedText = "gigantic.  ~~waterfall~~";
 
         given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
         // when
@@ -145,7 +145,7 @@ class VoiceMatchingServiceTest {
         var file = "Any binary, actually we don't need to test the format here".getBytes();
         var originalText = "domed web in the very";
         var transcribedText = "Dumped wet in the very";
-        var expectedText = "~~Dumped~~<mark>domed</mark> ~~wet~~<mark>web</mark> in the very";
+        var expectedText = "~~Dumped~~<mark>domed</mark> ~~wet~~<mark>web</mark>in the very";
 
         given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
         // when
@@ -161,7 +161,7 @@ class VoiceMatchingServiceTest {
         var file = "Any binary, actually we don't need to test the format here".getBytes();
         var originalText = "Hermione'll probably have all the";
         var transcribedText = "Hermione will probably have all the";
-        var expectedText = "~~Hermione~~<mark>Hermione'll</mark> ~~will~~probably have all the";
+        var expectedText = "~~Hermione~~ ~~will~~<mark>Hermione'll</mark>probably have all the";
 
         given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
         // when
@@ -178,7 +178,22 @@ class VoiceMatchingServiceTest {
         var file = "Any binary, actually we don't need to test the format here".getBytes();
         var originalText = "Dully, Harry turned  it over,";
         var transcribedText = "Duely, he returned it over";
-        var expectedText = "~~Duely,~~<mark>Dully,</mark> ~~he~~<mark>Harry</mark> ~~returned~~<mark>turned</mark>  it over,";
+        var expectedText = "~~Duely,~~<mark>Dully,</mark> ~~he~~<mark>Harry</mark> ~~returned~~<mark>turned</mark>it over,";
+
+        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        // when
+        var result = voiceMatchingService.process(file, originalText);
+
+        // then
+        assertEquals(expectedText, result);
+    }
+
+    @Test
+    void testProcessMismatchReturnWithOneSpace() {
+        var file = "Any binary, actually we don't need to test the format here".getBytes();
+        var originalText = "the hen-houses";
+        var transcribedText = "the tent cast";
+        var expectedText = "the ~~tent~~ ~~cast~~<mark>hen-houses</mark>";
 
         given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
         // when

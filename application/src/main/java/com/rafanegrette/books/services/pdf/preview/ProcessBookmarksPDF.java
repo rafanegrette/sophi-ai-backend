@@ -81,6 +81,8 @@ public class ProcessBookmarksPDF {
 
             while(bookMark == null && !parentsOutlines.isEmpty()) {
                 bookMark = parentsOutlines.pop().getNextSibling();
+                pageNo = getPageNumber(bookMark, bookPdf);
+                addPageToPageChapter(pageChapters, pageNo);
             }
 
         } while (bookMark != null);
@@ -101,8 +103,8 @@ public class ProcessBookmarksPDF {
 
     private static int addOutline(List<ContentIndex> outlines,
                                   PDOutlineItem bookMark,
-                                  int index, TreeMap<Integer,
-                                  Integer> stackPage,
+                                  int index,
+                                  TreeMap<Integer, Integer> stackPage,
                                   ChapterId chapterId,
                                   PDDocument bookPdf) throws IOException {
         if (bookMark.getTitle() != null && !bookMark.getTitle().isBlank()) {

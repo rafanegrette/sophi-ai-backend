@@ -86,24 +86,15 @@ class ProcessContentPagePDFTest {
     @Disabled
     void testRealBookDissable() throws IOException
     {
-        Path path = Paths.get("/home/rafa/Documents/books/neuromancer.pdf");
+
         var paragraphFormatsDefault = new ParagraphFormats(1.6f, false, ParagraphSeparator.TWO_JUMP);
-        byte[] bytesFile = Files.readAllBytes(path);
-        var formParameter = new FormParameter("Harry-2",
-                paragraphFormatsDefault,
-                ChapterTitleType.BOOKMARK,
-                FirstPageOffset.ONE,
-                false);
-        PDDocument document = getDocumentFromByteFile(bytesFile, formParameter);
+
+        PDDocument document = PDFUtils.getDocumentFromFilePath("/home/rafa/Documents/books/neuromancer.pdf");
 
         var rawPageReturned = processContentPage.extractRawText(document, 8, paragraphFormatsDefault, s -> s);
 
         assertNotNull(rawPageReturned);
 
-    }
-
-    private PDDocument getDocumentFromByteFile(byte[] bookFile, FormParameter formParameter) throws IOException {
-        return Loader.loadPDF(bookFile);
     }
 
 

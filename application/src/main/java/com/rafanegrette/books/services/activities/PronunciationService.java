@@ -13,9 +13,15 @@ public class PronunciationService {
 
     public Transcript evaluate(PronunciationRequest pronunciationRequest) {
         var resultSentence = voiceMatchingPhrases.process(pronunciationRequest.userAudio(), pronunciationRequest.originalSentence());
-        if (resultSentence.equals(pronunciationRequest.originalSentence())) {
-            return new Transcript(resultSentence, true);
+        if (containsMarks(resultSentence)) {
+            return new Transcript(resultSentence, false);
         }
-        return new Transcript(resultSentence, false);
+        return new Transcript(resultSentence, true);
     }
+
+    private boolean containsMarks(String resultSentence) {
+        return (resultSentence.contains("~~") || resultSentence.contains("<mark>"));
+    }
+
+
 }
