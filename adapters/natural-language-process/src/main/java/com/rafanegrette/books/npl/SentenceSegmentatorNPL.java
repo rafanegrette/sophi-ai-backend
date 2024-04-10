@@ -7,6 +7,7 @@ import com.rafanegrette.books.services.pdf.preview.SentenceLength;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import opennlp.tools.sentdetect.SentenceDetectorME;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,13 +15,15 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
 @Slf4j
 public class SentenceSegmentatorNPL implements SentenceSegmentator {
 
     private final ModelSegmentSentence sentenceDetector;
 
+    public SentenceSegmentatorNPL(@Lazy ModelSegmentSentence sentenceDetector) {
+        this.sentenceDetector = sentenceDetector;
+    }
     @Override
     public LinkedList<Sentence> createSentences(String paragraph, SentenceLength sentenceLength) {
         String[] detectedPhrases = sentenceDetector.detectSentence(stripJumpLine(paragraph));
