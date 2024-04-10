@@ -25,4 +25,3 @@ public class ModelSegmentSentence {
         return sentenceDetectorME.sentDetect(text);
     }
 }
-en un recipiente
