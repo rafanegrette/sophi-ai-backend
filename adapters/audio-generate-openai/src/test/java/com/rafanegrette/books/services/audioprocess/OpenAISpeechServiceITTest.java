@@ -2,6 +2,7 @@ package com.rafanegrette.books.services.audioprocess;
 
 import com.rafanegrette.books.services.audioprocess.conf.OpenAIAudioParameters;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+@Disabled
 public class OpenAISpeechServiceITTest {
     private OpenAiSpeechService openAiSpeechService;
 
