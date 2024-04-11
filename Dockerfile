@@ -1,4 +1,4 @@
-FROM gradle:8.4.0-jdk17-alpine as build
+FROM gradle:8.7.0-jdk21-alpine as build
 LABEL authors="rafanegrette"
 WORKDIR /workspace/app
 
