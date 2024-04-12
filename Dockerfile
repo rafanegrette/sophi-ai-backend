@@ -9,7 +9,7 @@ RUN apk add gcompat
 RUN gradle clean build -x test
 RUN mkdir -p configuration/build/dependency && (cd configuration/build/dependency; jar -xf ../libs/*-SNAPSHOT.jar)
 
-FROM gradle:8.4.0-jdk17-alpine
+FROM gradle:8.7.0-jdk21-alpine
 VOLUME /tmp
 WORKDIR /
 ARG DEPENDENCY=/workspace/app/configuration/build/dependency
