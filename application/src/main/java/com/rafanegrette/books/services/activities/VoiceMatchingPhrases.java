@@ -15,8 +15,8 @@ import static java.lang.Math.max;
 public class VoiceMatchingPhrases extends DynamicMatchingPhrases<String> {
 
     private final SpeechToTextService speechToTextService;
-    private static final String REGEX_SPLIT_WORDS = "(?<=\\S)(?=\\s)|(?<=\\s)(?=\\S)";
-    //private static final String REGEX_SPLIT_WORDS = "(?=\\s)";
+    private static final String REGEX_SPLIT_WORDS = "[ -]+";
+
     public VoiceMatchingPhrases(@Qualifier("WhisperService") SpeechToTextService speechToTextService) {
         this.speechToTextService = speechToTextService;
     }

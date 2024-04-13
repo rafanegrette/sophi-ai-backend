@@ -1,7 +1,6 @@
 package com.rafanegrette.books.services.activities;
 
 import com.rafanegrette.books.port.out.SpeechToTextService;
-import com.rafanegrette.books.services.activities.VoiceMatchingPhrases;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class VoiceMatchingServiceTest {
+class VoiceMatchingPhrasesTest {
 
     @Mock
     SpeechToTextService speechToTextService;
@@ -193,7 +192,7 @@ class VoiceMatchingServiceTest {
         var file = "Any binary, actually we don't need to test the format here".getBytes();
         var originalText = "the hen-houses";
         var transcribedText = "the tent cast";
-        var expectedText = "the ~~tent~~ ~~cast~~<mark>hen-houses</mark>";
+        var expectedText = "the ~~tent~~<mark>hen</mark> ~~cast~~<mark>houses</mark>";
 
         given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
         // when
@@ -204,12 +203,11 @@ class VoiceMatchingServiceTest {
     }
 
     @Test
-    @Disabled
     void testMatchWithHyphen() {
         var file = "Any binary, actually we don't need to test the format here".getBytes();
         var originalText = "the hen-houses";
         var transcribedText = "the hen houses";
-        var expectedText = "the hen-houses";
+        var expectedText = "the hen houses";
 
         given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
         // when
