@@ -15,7 +15,7 @@ import static java.lang.Math.max;
 public class VoiceMatchingPhrases extends DynamicMatchingPhrases<String> {
 
     private final SpeechToTextService speechToTextService;
-    private static final String REGEX_SPLIT_WORDS = "[ -]+";
+    private static final String REGEX_SPLIT_WORDS = "[ —-]+";
 
     public VoiceMatchingPhrases(@Qualifier("WhisperService") SpeechToTextService speechToTextService) {
         this.speechToTextService = speechToTextService;
@@ -35,7 +35,10 @@ public class VoiceMatchingPhrases extends DynamicMatchingPhrases<String> {
 
         try {
             while (i > 0 || j > 0) {
-                if (dp[i - 1][j] < dp[i][j] && dp[i][j  - 1] < dp[i][j]) {
+                if (    (j > 0 && i > 0)
+                        &&
+                        (dp[i - 1][j] < dp[i][j] && dp[i][j  - 1] < dp[i][j])
+                ) { // there is a match, take the diagonal matrix value
                     words.offer(originalWords[j - 1]);
                     i--;
                     j--;

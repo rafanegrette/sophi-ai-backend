@@ -216,4 +216,35 @@ class VoiceMatchingPhrasesTest {
         // then
         assertEquals(expectedText, result);
     }
+
+    // —
+    @Test
+    void testMatchWithLongHyphen() {
+        var file = "Any binary, actually we don't need to test the format here".getBytes();
+        var originalText = "the hen houses";
+        var transcribedText = "the hen—houses";
+        var expectedText = "the hen houses";
+
+        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        // when
+        var result = voiceMatchingService.process(file, originalText);
+
+        // then
+        assertEquals(expectedText, result);
+    }
+
+    @Test
+    void testLMatchShortTranslationWithLongSentence() {
+        var file  = "Any binary, actually we don't need to test the format here".getBytes();
+        var originalText = "definitely are dissolving.";
+        var transcribedText = "Yeah";
+        var expectedText = "<mark>definitely</mark> <mark>are</mark> ~~Yeah~~<mark>dissolving.</mark>";
+        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+
+        // when
+        var result = voiceMatchingService.process(file, originalText);
+
+        // then
+        assertEquals(expectedText, result);
+    }
 }
