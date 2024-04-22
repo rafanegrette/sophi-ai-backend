@@ -21,8 +21,6 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfigLocal {
 
-    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-
     @Value("${frontend.url}")
     private String frontEndUrl;
 
@@ -35,7 +33,7 @@ public class SecurityConfigLocal {
                     auth.anyRequest().permitAll();
                 })
                 .oauth2Login(oath2 -> {
-                    oath2.successHandler(oAuth2LoginSuccessHandler);
+                    oath2.defaultSuccessUrl(frontEndUrl);
                 })
                 .build();
     }
