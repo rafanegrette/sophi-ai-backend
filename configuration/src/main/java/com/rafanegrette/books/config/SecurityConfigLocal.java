@@ -29,9 +29,9 @@ public class SecurityConfigLocal {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> {
-                    auth.anyRequest().permitAll();
-                })
+                .authorizeHttpRequests(auth ->
+                    auth.anyRequest().permitAll()
+                )
                 .oauth2Login(oath2 -> {
                     oath2.defaultSuccessUrl(frontEndUrl);
                 })
