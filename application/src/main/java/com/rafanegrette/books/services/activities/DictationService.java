@@ -22,7 +22,7 @@ public class DictationService extends DynamicMatchingPhrases<Character> {
         var userArray = strToCharacterArray(listeningSentenceRequest.userText());
         var matchedText = getMatched(originalArray, userArray);
 
-        if (listeningSentenceRequest.userText().equalsIgnoreCase((matchedText))) {
+        if (!matchedText.isEmpty() && listeningSentenceRequest.userText().equalsIgnoreCase((matchedText))) {
             bookUserStateService.advanceState(listeningSentenceRequest.bookId());
             return new ListeningSentenceResponse(true, matchedText);
         }
@@ -51,7 +51,7 @@ public class DictationService extends DynamicMatchingPhrases<Character> {
 
         try {
             while (i > 0 || j > 0) {
-                if (dp[i - 1][j] < dp[i][j] && dp[i][j - 1] < dp[i][j]) { // Equals
+                if ((i > 0 && j > 0) && (dp[i - 1][j] < dp[i][j] && dp[i][j - 1] < dp[i][j])) { // Equals
                     words.offer(originalWords[j - 1].toString());
                     i--;
                     j--;

@@ -145,4 +145,23 @@ class DictationServiceTest {
         assertFalse(response.accepted());
         assertEquals("it<mark>'</mark>s bran", response.result());
     }
+
+    @Test
+    void updateStatusEmptyUserInput() {
+        // Given
+        var userText = "";
+        var bookText = "it's bran";
+        var bookId = BookMother.harryPotter1().build().id();
+        var userEmail = "ethusertest@gmail.com";
+        var request = new ListeningSentenceRequest(bookId, userText, bookText);
+
+        // When
+        var response = dictationService.updateStatus(userEmail, request);
+
+        // Then
+
+        assertNotNull(response);
+        assertFalse(response.accepted());
+        assertEquals("<mark>i</mark><mark>t</mark>", response.result());
+    }
 }
