@@ -21,9 +21,9 @@ public class SaveBookAudioService implements SaveBookService {
     @Override
     public void save(Book book) {
         
-        book.chapters().forEach(chapter -> {
-            chapter.pages().forEach(page -> {
-                page.paragraphs().forEach(paragraph -> {
+        book.chapters().parallelStream().forEach(chapter ->
+            chapter.pages().parallelStream().forEach(page ->
+                page.paragraphs().forEach(paragraph ->
                     paragraph.sentences().forEach(sentence -> {
                         var audioParam = new AudioParams(book.id(), 
                                             chapter.id(), 
@@ -31,10 +31,10 @@ public class SaveBookAudioService implements SaveBookService {
                                             paragraph.id(), 
                                             sentence.id());
                         process(audioParam,  sentence);
-                    });
-                });
-            });
-        });
+                    })
+                )
+            )
+        );
     }
 
     private void process(AudioParams audioParams, Sentence sentence) {

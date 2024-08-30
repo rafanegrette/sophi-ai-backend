@@ -25,4 +25,10 @@ public class OpenAIAudioParameters {
 
     @Value("${openai.audio.responseformat}")
     private String responseFormat;
+
+    @Value("${openai.audio.retries}")
+    private Integer retriesNo;
+
+    @Value("${openai.audio.back-off-milli-seconds}")
+    private Integer backOffMilliSeconds;
 }

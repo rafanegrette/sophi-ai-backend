@@ -60,7 +60,7 @@ class ReadBookUserStateServiceTest {
     void testIncreaseStateOfSentence() {
         // given
         var book = BookMother.harryPotter1().build();
-        var currentChapter = book.chapters().get(0);
+        var currentChapter = book.chapters().getFirst();
         var currentPage = currentChapter.pages().get(2);
         var currentParagraph = currentPage.paragraphs().get(2);
         var currentSentence = currentParagraph.sentences().get(0);
@@ -92,10 +92,10 @@ class ReadBookUserStateServiceTest {
     void testIncreaseStateOfParagraph() {
         // given
         var book = BookMother.harryPotter1().build();
-        var currentChapter = book.chapters().get(0);
-        var currentPage = currentChapter.pages().get(0);
-        var currentParagraph = currentPage.paragraphs().get(0);
-        var currentSentence = currentParagraph.sentences().get(0);
+        var currentChapter = book.chapters().getFirst();
+        var currentPage = currentChapter.pages().getFirst();
+        var currentParagraph = currentPage.paragraphs().getFirst();
+        var currentSentence = currentParagraph.sentences().getFirst();
         var bookState = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
@@ -106,7 +106,7 @@ class ReadBookUserStateServiceTest {
                 currentChapter.id(),
                 currentPage.number(),
                 currentPage.paragraphs().get(1).id(),
-                currentPage.paragraphs().get(1).sentences().get(0).id(),
+                currentPage.paragraphs().get(1).sentences().getFirst().id(),
                 false);
 
         given(readBookService.getBook(book.id())).willReturn(Optional.of(book));
@@ -124,13 +124,13 @@ class ReadBookUserStateServiceTest {
     void testIncreaseStateOfPage() {
         // given
         var book = BookMother.harryPotter1().build();
-        var currentChapter = book.chapters().get(0);
-        var currentPage = currentChapter.pages().get(0);
+        var currentChapter = book.chapters().getFirst();
+        var currentPage = currentChapter.pages().getFirst();
         var currentParagraph = currentPage.paragraphs().get(1);
-        var currentSentence = currentParagraph.sentences().get(0);
+        var currentSentence = currentParagraph.sentences().getFirst();
         var nextPage = currentChapter.pages().get(1);
-        var nextParagraph = nextPage.paragraphs().get(0);
-        var nextSentence = nextParagraph.sentences().get(0);
+        var nextParagraph = nextPage.paragraphs().getFirst();
+        var nextSentence = nextParagraph.sentences().getFirst();
         var bookState = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
@@ -158,14 +158,14 @@ class ReadBookUserStateServiceTest {
     void testIncreaseStateOfChapter() {
         // given
         var book = BookMother.harryPotter1().build();
-        var currentChapter = book.chapters().get(0);
+        var currentChapter = book.chapters().getFirst();
         var currentPage = currentChapter.pages().get(2); // page 3
         var currentParagraph = currentPage.paragraphs().get(2); // third paragraph
         var currentSentence = currentParagraph.sentences().get(1); // second&last sentence
         var nextChapter = book.chapters().get(1);
-        var nextPage = nextChapter.pages().get(0);
-        var nextParagraph = nextPage.paragraphs().get(0);
-        var nextSentence = nextParagraph.sentences().get(0);
+        var nextPage = nextChapter.pages().getFirst();
+        var nextParagraph = nextPage.paragraphs().getFirst();
+        var nextSentence = nextParagraph.sentences().getFirst();
         var bookState = new BookCurrentState(book.id(),
                 currentChapter.id(),
                 currentPage.number(),
@@ -217,6 +217,7 @@ class ReadBookUserStateServiceTest {
         // when
         readBookUserStateService.advanceState(book.id());
         // then
+
         verify(bookUserStateRepository).saveState(userEmail, bookStateExpected);
     }
 
