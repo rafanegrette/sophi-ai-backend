@@ -21,8 +21,8 @@ public class SaveBookAudioService implements SaveBookService {
     @Override
     public void save(Book book) {
         
-        book.chapters().parallelStream().forEach(chapter ->
-            chapter.pages().parallelStream().forEach(page ->
+        book.chapters().forEach(chapter ->
+            chapter.pages().forEach(page ->
                 page.paragraphs().forEach(paragraph ->
                     paragraph.sentences().forEach(sentence -> {
                         var audioParam = new AudioParams(book.id(), 
