@@ -14,6 +14,9 @@ public class UserSecuritySocial implements UserSecurityService {
 
     private final CreateUserService createUserService;
 
+    // TODO handlerController(@CurrentSecurityContext(expression= "authentication.name" String name) -> get adnostic authentication server details
+    // or TODO @AuthenticationPrincipal Jwt jwt // does the same
+
     @Override
     public User getUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
