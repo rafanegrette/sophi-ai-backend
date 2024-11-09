@@ -11,6 +11,7 @@ dependencies {
 	implementation project(':adapters:audio-generate-openai')
 	implementation project(':adapters:read-token')
 	implementation project(':adapters:open-api')
+	implementation project(':test-data')
 
 	implementation 'org.springframework.boot:spring-boot-starter-web:'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
