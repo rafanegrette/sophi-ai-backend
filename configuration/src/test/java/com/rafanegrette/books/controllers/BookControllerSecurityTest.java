@@ -1,106 +1,156 @@
 package com.rafanegrette.books.controllers;
 
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import com.rafanegrette.books.npl.config.ModelSegmentSentence;
-import com.rafanegrette.books.repositories.BookRepositoryDynamo;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rafanegrette.books.config.SecurityConfig;
+import com.rafanegrette.books.model.Book;
+import com.rafanegrette.books.model.UploadForm;
+import com.rafanegrette.books.model.mother.BookMother;
 import com.rafanegrette.books.repositories.entities.TitleImpl;
 import com.rafanegrette.books.services.ReadBookDBService;
-import com.rafanegrette.books.services.ReadBookService;
+import com.rafanegrette.books.services.pdf.preview.PreviewBookService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.core.OAuth2UserCode;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.function.Consumer;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
-import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest
+@ActiveProfiles("prod")
+@ExtendWith(SpringExtension.class)
+@WebAppConfiguration
+@AutoConfigureWebMvc
 @AutoConfigureMockMvc
-@ContextConfiguration(classes = {BookController.class})
+@ContextConfiguration(classes = {PreviewController.class,BookController.class, SecurityConfig.class})
+@TestPropertySource(properties = {
+        "frontend.url=http://localhost",
+        "spring.security.oauth2.client.registration.cognito.client-id=dsjkhfjkds",
+        "spring.security.oauth2.client.provider.cognito.issuer-uri=http://localhost"
+})
 public class BookControllerSecurityTest {
 
     @Autowired
-    private MockMvc mvc;
+    private WebApplicationContext context;
+
+    @MockBean
+    ClientRegistrationRepository clientRegistrationRepository;
 
     @MockBean
     ReadBookDBService readBookService;
 
-    @Test
-    void shouldNotAllowTokenWithInvalidAudience() throws Exception {
-        //String token = mint(claims -> claims.audience(List.of("https://bucanero")));
+    @MockBean
+    PreviewBookService previewService;
 
-        this.mvc.perform(get("/books/titles"))
-                .andExpect(status().is3xxRedirection());
-                //.andExpect(content().string(containsString("Don't have an account?")));
-                //.andExpect(header().string("WWW-Authenticate", containsString("aud claim is not valid")));
+    private MockMvc mvc;
+
+    @BeforeEach
+    void setUp() {
+        mvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
+                .apply(springSecurity())
+                .build();
     }
 
     @Test
-    @WithMockUser("username = Ralphy")
-    void shouldAllowTokenSuccess() throws Exception {
-        //String token = mint(claims -> claims.audience(List.of("user")));
+    void shouldRedirectUnauthenticatedUser() throws Exception {
+        this.mvc.perform(get("/books/titles"))
+                .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    @WithMockUser(username = "Ralphy")
+    void authenticatedUserWithoutAuthorization403() throws Exception {
+        this.mvc.perform(get("/books/titles")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "Ralphy", roles = "sophi-user" )
+    void shouldAllowAuthenticatedUserWithAuthorization() throws Exception {
         when(readBookService.getAllTitles()).thenReturn(List.of(new TitleImpl("1", "book 1", "the end")));
         this.mvc.perform(get("/books/titles")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
-    /*private String mint(Consumer<JwtClaimsSet.Builder> consumer) {
-        JwtClaimsSet.Builder builder = JwtClaimsSet.builder()
-                .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(100_000))
-                .subject("ralph")
-                .issuer("http//localhost:9000")
-                .audience(Arrays.asList("user"))
-                .claim("scp", Arrays.asList("openid"));
-        consumer.accept(builder);
-        JwtEncoderParameters parameters = JwtEncoderParameters.from(builder.build());
-        return this.jwtEncoder.encode(parameters).getTokenValue();
+    @Test
+    @WithMockUser(username = "Ralphy", roles = "sophi-user" )
+    void authenticatedUserWithDifferentRoleShouldFail() throws Exception {
+        var objectMapper = new ObjectMapper();
+        var uploadForm = new UploadForm("bookformat-base64",
+                "fantasi",
+                "TWO",
+                "CONTENT",
+                1,
+                false,
+                false,
+                240);
+
+        when(previewService.previewPDF(uploadForm)).thenReturn(BookMother.harryPotter1().build());
+
+        this.mvc.perform(post("/books/preview")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(uploadForm)))
+                .andExpect(status().isForbidden());
     }
 
-    @TestConfiguration
-    static class TestJwtConfiguration {
+    @Test
+    @WithMockUser(username = "Ralphy", roles = "sophi-uploader" )
+    void authenticatedUserWithUploaderAuthorization() throws Exception {
+        Book book = BookMother.harryPotter1().build();
+        var uploadForm = new UploadForm(objectToString(book),
+                "fantasi",
+                "TWO",
+                "CONTENT",
+                1,
+                false,
+                false,
+                240);
+        ObjectMapper mapper = new ObjectMapper();
 
-        @Bean
-        JwtEncoder jwtEncoder(@Value("classpath:authz.pub") RSAPublicKey pub,
-                              @Value("classpath:authz.pem") RSAPrivateKey pem) {
-            RSAKey key = new RSAKey.Builder(pub).privateKey(pem).build();
-            return new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(key)));
+        when(previewService.previewPDF(uploadForm)).thenReturn(BookMother.harryPotter1().build());
+
+        this.mvc.perform(post("/books/preview")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(uploadForm)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    private String objectToString(Book book) throws IOException {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+             ObjectOutputStream out = new ObjectOutputStream(bos)) {
+            out.writeObject(book);
+            out.flush();
+            return bos.toString();
         }
     }
-    */
+
 }

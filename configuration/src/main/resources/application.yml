@@ -16,6 +16,8 @@ spring:
     oauth2:
       client:
         provider:
+          cognito:
+            issuer-uri: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_ciOQR6VtP
           google:
             authorizationUri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&prompt=consent
         registration:
@@ -24,6 +26,14 @@ spring:
               - email
               - profile
               - openid
+          cognito:
+            scope:
+              - openid
+              - email
+              - email
+              - sophi-ai-systems-resource-server/sophi_reading
+              - sophi-ai-systems-resource-server/sophi_writing
+            client-id: kdsjfk
 #logging:
 #  level:
 #    org.springframework.security.oauth2: TRACE
