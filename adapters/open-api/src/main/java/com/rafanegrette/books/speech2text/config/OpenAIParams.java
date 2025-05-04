@@ -1,4 +1,4 @@
-package com.rafanegrette.books.wavtovec.config;
+package com.rafanegrette.books.speech2text.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

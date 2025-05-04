@@ -2,36 +2,23 @@ package com.rafanegrette.books.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rafanegrette.books.model.User;
-import com.rafanegrette.books.npl.config.ModelSegmentSentence;
 import com.rafanegrette.books.service.UserSecuritySocial;
 import com.rafanegrette.books.services.CreateUserService;
-import com.rafanegrette.books.services.UserSecurityService;
-import com.rafanegrette.books.wavtovec.config.OpenAIConfiguration;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthorizationCodeAuthenticationToken;
-import org.springframework.security.oauth2.core.OAuth2UserCode;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.web.reactive.function.client.WebClient;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;

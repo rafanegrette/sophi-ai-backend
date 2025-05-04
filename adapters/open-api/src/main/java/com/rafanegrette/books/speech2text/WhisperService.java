@@ -1,4 +1,4 @@
-package com.rafanegrette.books.wavtovec;
+package com.rafanegrette.books.speech2text;
 
 import java.util.function.Consumer;
 
@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.rafanegrette.books.port.out.SpeechToTextService;
-import com.rafanegrette.books.wavtovec.config.OpenAIParams;
+import com.rafanegrette.books.speech2text.config.OpenAIParams;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +32,7 @@ public class WhisperService implements SpeechToTextService {
 	}
 	
 	@Override
-	public String wavToVec(byte[] blobFile) {
+	public String transcribe(byte[] blobFile) {
 		var headersConsumer = getHeaders();
 		var bodyBuilder = getBodyBuilder(blobFile);
 		var transcript = "";

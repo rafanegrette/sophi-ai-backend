@@ -9,6 +9,7 @@ dependencies {
 	implementation project(':adapters:books-dynamodb')
 	//implementation project(':adapters:audio-generate-azure')
 	implementation project(':adapters:audio-generate-openai')
+	implementation project(':adapters:conversation-bot-openai')
 	implementation project(':adapters:read-token')
 	implementation project(':adapters:open-api')
 	implementation project(':test-data')

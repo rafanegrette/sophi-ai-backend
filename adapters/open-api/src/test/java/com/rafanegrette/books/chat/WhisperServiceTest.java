@@ -1,14 +1,15 @@
-package com.rafanegrette.books.wavtovec;
+package com.rafanegrette.books.chat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.rafanegrette.books.speech2text.WhisperService;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import com.rafanegrette.books.wavtovec.config.OpenAIParams;
+import com.rafanegrette.books.speech2text.config.OpenAIParams;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -16,7 +17,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.aMultipart;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.ok;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 
 @WireMockTest
@@ -28,7 +28,7 @@ class WhisperServiceTest {
 	WhisperService whisperService;
 	
 	@Test
-	void testWavToVec(WireMockRuntimeInfo wMockRuntimeInfo) {
+	void testTranscribe(WireMockRuntimeInfo wMockRuntimeInfo) {
 		// given
 		var voiceFile = "Hello Hello I know".getBytes();
 		configureService(wMockRuntimeInfo.getHttpPort());
@@ -49,9 +49,9 @@ class WhisperServiceTest {
 						.withStatus(200)
 						.withBody("Audio Transcripted"))
 				);
-		var transcript = whisperService.wavToVec(voiceFile);
+		var transcript = whisperService.transcribe(voiceFile);
 		// then
-		assertNotNull(transcript);;
+		assertNotNull(transcript);
 	}
 	
 	private void configureService(int port) {

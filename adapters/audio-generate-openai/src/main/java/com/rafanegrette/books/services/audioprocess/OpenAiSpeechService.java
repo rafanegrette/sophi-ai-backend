@@ -1,5 +1,6 @@
 package com.rafanegrette.books.services.audioprocess;
 
+import com.rafanegrette.books.port.out.TextToSpeechService;
 import com.rafanegrette.books.services.audioprocess.conf.OpenAIAudioParameters;
 import com.rafanegrette.books.services.audioprocess.model.SpeechDTO;
 import com.rafanegrette.books.services.audiosavefiles.SpeechService;
@@ -16,7 +17,7 @@ import java.time.Duration;
 
 @Service
 @Slf4j
-public class OpenAiSpeechService implements SpeechService {
+public class OpenAiSpeechService implements SpeechService, TextToSpeechService {
 
     private final WebClient webClient;
     private final OpenAIAudioParameters parameters;
@@ -49,6 +50,11 @@ public class OpenAiSpeechService implements SpeechService {
                 })
                 .retryWhen(retrySpec)
                 .block();
+    }
+
+    @Override
+    public byte[] speech(String text) {
+        return getBinaryFile(text);
     }
 
     static class LimitExceededException extends RuntimeException {}

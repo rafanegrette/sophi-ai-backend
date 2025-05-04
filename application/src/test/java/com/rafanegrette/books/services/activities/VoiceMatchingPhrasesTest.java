@@ -1,7 +1,6 @@
 package com.rafanegrette.books.services.activities;
 
 import com.rafanegrette.books.port.out.SpeechToTextService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +27,7 @@ class VoiceMatchingPhrasesTest {
         var file = "Any binary, actually we don't need to test the format here".getBytes();
         var originalText = "This is a very good test";
 
-        given(speechToTextService.wavToVec(file)).willReturn(originalText);
+        given(speechToTextService.transcribe(file)).willReturn(originalText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -45,7 +44,7 @@ class VoiceMatchingPhrasesTest {
         var transcribedText = "This is a beautiful very good test";
         var expectedText = "This is a ~~beautiful~~very good test";
 
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -62,7 +61,7 @@ class VoiceMatchingPhrasesTest {
         var transcribedText = "This is a good test";
         var expectedText = "This is a <mark>very</mark>good test";
 
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -79,7 +78,7 @@ class VoiceMatchingPhrasesTest {
         var transcribedText = "This is a, ver'y good? test\n";
         var expectedText = "This, is a very good test!";
 
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -96,7 +95,7 @@ class VoiceMatchingPhrasesTest {
         var transcribedText = "this is a very GOOD TEST";
         var expectedText = "This is a very good test";
 
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -113,7 +112,7 @@ class VoiceMatchingPhrasesTest {
         var transcribedText = "Gigantic\n";
         var expectedText = "gigantic. ";
 
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -130,7 +129,7 @@ class VoiceMatchingPhrasesTest {
         var transcribedText = "Gigantic waterfall\n";
         var expectedText = "gigantic.  ~~waterfall~~";
 
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -146,7 +145,7 @@ class VoiceMatchingPhrasesTest {
         var transcribedText = "Dumped wet in the very";
         var expectedText = "~~Dumped~~<mark>domed</mark> ~~wet~~<mark>web</mark>in the very";
 
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -162,7 +161,7 @@ class VoiceMatchingPhrasesTest {
         var transcribedText = "Hermione will probably have all the";
         var expectedText = "~~Hermione~~ ~~will~~<mark>Hermione'll</mark>probably have all the";
 
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -179,7 +178,7 @@ class VoiceMatchingPhrasesTest {
         var transcribedText = "Duely, he returned it over";
         var expectedText = "~~Duely,~~<mark>Dully,</mark> ~~he~~<mark>Harry</mark> ~~returned~~<mark>turned</mark>it over,";
 
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -194,7 +193,7 @@ class VoiceMatchingPhrasesTest {
         var transcribedText = "the tent cast";
         var expectedText = "the ~~tent~~<mark>hen</mark> ~~cast~~<mark>houses</mark>";
 
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -209,7 +208,7 @@ class VoiceMatchingPhrasesTest {
         var transcribedText = "the hen houses";
         var expectedText = "the hen houses";
 
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -225,7 +224,7 @@ class VoiceMatchingPhrasesTest {
         var transcribedText = "the hen—houses";
         var expectedText = "the hen houses";
 
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
         // when
         var result = voiceMatchingService.process(file, originalText);
 
@@ -239,7 +238,7 @@ class VoiceMatchingPhrasesTest {
         var originalText = "definitely are dissolving.";
         var transcribedText = "Yeah";
         var expectedText = "<mark>definitely</mark> <mark>are</mark> ~~Yeah~~<mark>dissolving.</mark>";
-        given(speechToTextService.wavToVec(file)).willReturn(transcribedText);
+        given(speechToTextService.transcribe(file)).willReturn(transcribedText);
 
         // when
         var result = voiceMatchingService.process(file, originalText);

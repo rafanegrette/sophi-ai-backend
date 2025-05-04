@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import java.util.LinkedList;
 import java.util.stream.Stream;
 
-import static java.lang.Math.max;
-
 @Slf4j
 @Service
 public class VoiceMatchingPhrases extends DynamicMatchingPhrases<String> {
@@ -22,7 +20,7 @@ public class VoiceMatchingPhrases extends DynamicMatchingPhrases<String> {
     }
 
     public String process(byte[] file, String originalText) {
-        var transcribed = speechToTextService.wavToVec(file);
+        var transcribed = speechToTextService.transcribe(file);
         var originalSpaceStriped = Stream.of(originalText.split(REGEX_SPLIT_WORDS)).map(String::trim).filter(s -> !s.isEmpty()).toArray(String[]::new);
         var transcribedStriped = Stream.of(transcribed.split(REGEX_SPLIT_WORDS)).map(String::trim).filter(s -> !s.isEmpty()).toArray(String[]::new);
         return getMatched(originalSpaceStriped, transcribedStriped);
