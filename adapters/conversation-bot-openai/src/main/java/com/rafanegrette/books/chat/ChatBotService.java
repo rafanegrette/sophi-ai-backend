@@ -1,6 +1,7 @@
 package com.rafanegrette.books.chat;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,7 +38,7 @@ public class ChatBotService implements ConversationBotService {
 	}
 	
 	@Override
-	public String sendMessage(String userMessage) {
+	public String sendMessage(UUID messageId, String userMessage) {
 		var headersConsumer = getHeaders();
 		var objectMapper = new ObjectMapper();
 		var chatRequest = getChatRequest(userMessage);

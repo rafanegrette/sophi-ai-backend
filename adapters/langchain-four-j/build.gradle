@@ -1,0 +1,9 @@
+dependencies {
+    implementation project(':application')
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'dev.langchain4j:langchain4j-open-ai:1.0.0-rc1'
+    implementation 'dev.langchain4j:langchain4j:1.0.0-rc1'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "com.github.tomakehurst:wiremock-standalone:3.0.1"
+}

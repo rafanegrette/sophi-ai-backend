@@ -59,7 +59,7 @@ class ChatBotServiceTest {
 						.withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
 						.withBody(objectMapper.writeValueAsString(getChatCompletionResponse("Hi buddy"))))
 				);
-		var chatResponse = chatBotService.sendMessage(voiceFile);
+		var chatResponse = chatBotService.sendMessage(UUID.randomUUID(), voiceFile);
 		// then
 		assertEquals("Hi buddy", chatResponse);
 	}

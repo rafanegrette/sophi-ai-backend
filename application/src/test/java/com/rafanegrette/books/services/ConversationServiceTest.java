@@ -27,17 +27,49 @@ class ConversationServiceTest {
     ConversationBotService conversationBotService;
     @Mock
     TextToSpeechService textToSpeechService;
+    @Mock
+    MessageIdGenerator messageIdGenerator;
 
     @Test
-    void chat() {
+    void chat_newConversation_Success() {
         // given
-        var conversationId = UUID.randomUUID().toString();
+
+        var userText = "Hello";
+        var userVoice = userText.getBytes();
+        var botText = "What's up";
+        var conversationIdExpected = UUID.randomUUID();
+
+        given(messageIdGenerator.generateUuid()).willReturn(conversationIdExpected);
+        given(speechToTextService.transcribe(userVoice)).willReturn(userText);
+        given(conversationBotService.sendMessage(conversationIdExpected, userText)).willReturn(botText);
+        given(textToSpeechService.speech(botText)).willReturn(botText.getBytes());
+
+        // when
+        var conversationResponse = conversationService.chat("", userVoice);
+
+        // then
+
+        verify(speechToTextService).transcribe(userVoice);
+        verify(conversationBotService).sendMessage(conversationIdExpected, userText);
+        verify(textToSpeechService).speech(botText);
+
+        assertEquals(botText, conversationResponse.botText());
+        assertEquals(userText, conversationResponse.userText());
+        assertNotNull(conversationResponse.botSpeech());
+        assertEquals(UUID.fromString(conversationResponse.conversationId()), conversationIdExpected);
+    }
+
+    @Test
+    void chat_existingConversation_Success() {
+        // given
+        var messageId = UUID.randomUUID();
+        var conversationId = messageId.toString();
         var userText = "Hello";
         var userVoice = userText.getBytes();
         var botText = "What's up";
 
         given(speechToTextService.transcribe(userVoice)).willReturn(userText);
-        given(conversationBotService.sendMessage(userText)).willReturn(botText);
+        given(conversationBotService.sendMessage(messageId, userText)).willReturn(botText);
         given(textToSpeechService.speech(botText)).willReturn(botText.getBytes());
 
         // when
@@ -46,11 +78,12 @@ class ConversationServiceTest {
         // then
 
         verify(speechToTextService).transcribe(userVoice);
-        verify(conversationBotService).sendMessage(userText);
+        verify(conversationBotService).sendMessage(messageId, userText);
         verify(textToSpeechService).speech(botText);
 
         assertEquals(botText, conversationResponse.botText());
         assertEquals(userText, conversationResponse.userText());
+        assertEquals(conversationId, conversationResponse.conversationId());
         assertNotNull(conversationResponse.botSpeech());
     }
 }
