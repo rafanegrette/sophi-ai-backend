@@ -8,27 +8,16 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.rafanegrette.books.model.TitleImpl;
 import com.rafanegrette.books.model.mother.BookMother;
-import com.rafanegrette.books.repositories.config.DynamoClient;
-import com.rafanegrette.books.repositories.config.DynamoDBConfig;
-import com.rafanegrette.books.repositories.entities.BookDyna;
 import com.rafanegrette.books.repositories.entities.mother.BookDynaMother;
 import com.rafanegrette.books.repositories.mappers.BookMapper;
-import com.rafanegrette.books.repositories.mappers.BookMapperImpl;
-
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 
 //@Disabled

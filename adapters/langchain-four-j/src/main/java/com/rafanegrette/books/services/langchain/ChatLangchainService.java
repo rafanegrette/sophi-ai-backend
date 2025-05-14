@@ -11,9 +11,14 @@ import java.util.UUID;
 public class ChatLangchainService implements ConversationBotService {
 
     private final EnglishTeacher englishTeacher;
+    private final TimeProvider clockProvider;
 
     @Override
     public String sendMessage(UUID messageId, String userMessage) {
-        return englishTeacher.chat(messageId, userMessage);
+        var bookName = "Neuromancer";
+        var today = clockProvider.getTime();
+        String prompt = new SystemPrompts().getDayPrompts(today).replace("[LITERATURE_BOOK]", bookName);
+        return englishTeacher.chat(messageId, prompt, userMessage);
     }
+
 }
