@@ -15,7 +15,7 @@ import java.util.Map;
 public class SystemPrompts {
 
     private static final Map<String, DayPrompt> dayPrompts;
-    public static final int HOUR_AFTERNOON_LIMIT = 16;
+    public static final int HOUR_AFTERNOON_LIMIT = 17;
 
     static class DayPrompt {
         String morning;
