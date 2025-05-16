@@ -164,4 +164,23 @@ class DictationServiceTest {
         assertFalse(response.accepted());
         assertEquals("<mark>i</mark><mark>t</mark>", response.result());
     }
+
+    // — -
+
+    @Test
+    void updateStatusWithRegionalSlashBookSuccess() {
+        // Given
+        var bookText = "Well done—ok";
+        var userText = "Well done-ok";
+        var bookId = BookMother.harryPotter1().build().id();
+        var userEmail = "ethusertest@gmail.com";
+        var request = new ListeningSentenceRequest(bookId, userText, bookText);
+        // When
+        var response = dictationService.updateStatus(userEmail, request);
+        // Then
+        assertNotNull(response);
+        assertTrue(response.accepted());
+        assertEquals(bookText, response.result());
+        verify(writeBookUserStateService).advanceState(bookId);
+    }
 }

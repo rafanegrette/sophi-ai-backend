@@ -22,7 +22,7 @@ public class DictationService extends DynamicMatchingPhrases<Character> {
         var userArray = strToCharacterArray(listeningSentenceRequest.userText());
         var matchedText = getMatched(originalArray, userArray);
 
-        if (!matchedText.isEmpty() && listeningSentenceRequest.userText().equalsIgnoreCase((matchedText))) {
+        if (!matchedText.isEmpty() && listeningSentenceRequest.userText().equalsIgnoreCase((matchedText.replace("—", "-")))) {
             bookUserStateService.advanceState(listeningSentenceRequest.bookId());
             return new ListeningSentenceResponse(true, matchedText);
         }
@@ -41,6 +41,7 @@ public class DictationService extends DynamicMatchingPhrases<Character> {
 
     @Override
     protected boolean isEqualsWords(Character originWord, Character translatedWord) {
+        if (originWord == '—' && translatedWord == '-') return true;
         return Character.toLowerCase(originWord) == Character.toLowerCase(translatedWord);
     }
 
