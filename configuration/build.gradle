@@ -12,7 +12,8 @@ dependencies {
 	//implementation project(':adapters:conversation-bot-openai')
 	implementation project(':adapters:langchain-four-j')
 	implementation project(':adapters:read-token')
-	implementation project(':adapters:open-api')
+	//implementation project(':adapters:open-api')
+	implementation project(':adapters:local-llm-whisper')
 	implementation project(':test-data')
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'

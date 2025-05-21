@@ -20,7 +20,7 @@ import org.springframework.test.context.TestPropertySource;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-//@Disabled
+@Disabled
 @TestPropertySource(properties = {
         "openai.authorization=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",
         "openai.chat.model=gpt-4-turbo",

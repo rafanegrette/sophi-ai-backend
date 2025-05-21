@@ -4,6 +4,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'dev.langchain4j:langchain4j-open-ai:1.0.0-rc1'
     implementation 'dev.langchain4j:langchain4j-milvus:1.0.0-beta4'
+    implementation 'dev.langchain4j:langchain4j-community-qianfan:1.0.0-beta4'
     implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2:1.0.0-beta4'
     implementation 'dev.langchain4j:langchain4j:1.0.0-rc1'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'

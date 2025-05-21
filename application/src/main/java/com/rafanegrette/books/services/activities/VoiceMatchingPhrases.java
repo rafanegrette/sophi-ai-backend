@@ -15,7 +15,7 @@ public class VoiceMatchingPhrases extends DynamicMatchingPhrases<String> {
     private final SpeechToTextService speechToTextService;
     private static final String REGEX_SPLIT_WORDS = "[ —-]+";
 
-    public VoiceMatchingPhrases(@Qualifier("WhisperService") SpeechToTextService speechToTextService) {
+    public VoiceMatchingPhrases(@Qualifier("LocalWhisperService") SpeechToTextService speechToTextService) {
         this.speechToTextService = speechToTextService;
     }
 
