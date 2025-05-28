@@ -14,14 +14,15 @@ public class OpenAiConfiguration {
     public OpenAiConfiguration(OpenAIAudioParameters parameters) {
         this.parameters = parameters;
     }
+
     @Bean("WebClientAudioOpenAi")
     @Qualifier("WebClientAudioOpenAi")
-    WebClient webClientOpenAI(WebClient.Builder builder) {
+    WebClient webClientOpenAI() {
 
         return WebClient.builder()
                 .baseUrl(parameters.getHost() + parameters.getPath())
                 .codecs(codecs -> codecs.defaultCodecs()
-                        .maxInMemorySize(2000 * 1024))
+                        .maxInMemorySize(16 * 1024 * 1024))
                 .defaultHeader("Authorization", "Bearer " + parameters.getAuthorization())
                 .build();
     }
