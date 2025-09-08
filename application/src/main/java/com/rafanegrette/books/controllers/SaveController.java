@@ -31,7 +31,7 @@ public class SaveController {
             saveBookService.save(book);
             return ResponseEntity.ok(null);
         } catch (Exception e) {
-            log.error("Controller error {}", e.getMessage());
+            log.error("Controller error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

@@ -5,9 +5,11 @@ import com.rafanegrette.books.model.Book;
 import com.rafanegrette.books.model.Sentence;
 import com.rafanegrette.books.port.out.SaveBookService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service("SaveBookAudioService")
 @RequiredArgsConstructor
 public class SaveBookAudioService implements SaveBookService {
