@@ -1,16 +1,12 @@
 package com.rafanegrette.books.services.pdf.preview;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.model.formats.ParagraphFormats;
 import com.rafanegrette.books.model.formats.ParagraphSeparator;
 import com.rafanegrette.books.services.NotContentException;
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -20,7 +16,6 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPa
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class ProcessChapterTest {
+public class ProcessChapterPDFTest {
 
     @InjectMocks
     ProcessChapterPDF processChapterPDF;
@@ -65,6 +60,34 @@ public class ProcessChapterTest {
         assertEquals("Page Title 7", pagesExpected.get(1).paragraphs().get(0).sentences().get(0).text());
     }
 
+    @Test
+    void testGetPagesNumbers() throws IOException {
+
+        // given
+        PDDocument document = getDocumentWithParagraph();
+        var contentIndex = new ContentIndex(2, "Chapter 2", 8, 12, 2);
+        var paragraphFormat = new ParagraphFormats(2.4f, false, ParagraphSeparator.TWO_JUMP);
+        var formParameter = new FormParameter("Harry-1",
+                paragraphFormat,
+                ChapterTitleType.CONTENT,
+                FirstPageOffset.TWO,
+                false);
+        Page page8 = new Page(0, List.of(new Paragraph(0, List.of(new Sentence(0, "hi")))));
+        Page page9 = new Page(0, List.of(new Paragraph(0, List.of(new Sentence(0, "Page Title 7")))));
+
+        given(processContentPage.getContentPage(document, 8, paragraphFormat)).willReturn(page8);
+        given(processContentPage.getContentPage(document, 9, paragraphFormat)).willReturn(page9);
+        given(processContentPage.getContentPage(document, 10, paragraphFormat)).willReturn(page8);
+        given(processContentPage.getContentPage(document, 11, paragraphFormat)).willReturn(page8);
+        // when
+        List<Page> pagesExpected = processChapterPDF.getPages(document, contentIndex, formParameter);
+
+        // then
+        assertEquals(1, pagesExpected.getFirst().number());
+        assertEquals(2, pagesExpected.get(1).number());
+        assertEquals(3, pagesExpected.get(2).number());
+        assertEquals(4, pagesExpected.getLast().number());
+    }
 
     @Test
     void testGetRightChapterIdTC1() throws IOException {

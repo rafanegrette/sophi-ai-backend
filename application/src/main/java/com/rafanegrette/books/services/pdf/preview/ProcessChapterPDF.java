@@ -10,8 +10,6 @@ import com.rafanegrette.books.model.*;
 import com.rafanegrette.books.services.NotContentException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
 
@@ -88,7 +86,7 @@ public class ProcessChapterPDF {
             lastNoPage = document.getNumberOfPages();
         }
 
-        for (int i = firstNoPage; i < lastNoPage; i++) {
+        for (int i = firstNoPage, j = 1; i < lastNoPage; i++, j++) {
             Page page;
             if (i == firstNoPage && formParameter.fixTitleHP2())
             {
@@ -97,38 +95,11 @@ public class ProcessChapterPDF {
             	page = processContentPage.getContentPage(document, i, formParameter.paragraphFormats());
             }
             
-            page = new Page(i - firstNoPage + 1, page.paragraphs());
+            page = new Page(j, page.paragraphs());
             pages.add(page);
         }
 
         return pages;
-    }
-
-    private Integer findFirstPageInChapter(PDDocument document, PDOutlineItem outlineItem, FirstPageOffset firstPageOffset)
-            throws IOException {
-        PDPage firstPage = outlineItem.findDestinationPage(document);
-        return document.getPages().indexOf(firstPage) + firstPageOffset.getValue();
-    }
-
-    private Integer findLastPageInChapter(PDDocument document, PDOutlineItem outlineItem) throws IOException {
-        PDOutlineItem nextChapter = nextOutlineItem(outlineItem);
-        Integer lastNoPage = 0;
-        if (nextChapter != null) {
-            PDPage lastPage = nextChapter.findDestinationPage(document);
-
-            lastNoPage = document.getPages().indexOf(lastPage) + 1;
-        } else {
-            lastNoPage = document.getNumberOfPages() + 1;
-        }
-        return lastNoPage;
-    }
-
-    private PDOutlineItem nextOutlineItem(PDOutlineItem outlineItem) {
-        if (outlineItem.hasChildren()) {
-            return outlineItem.getFirstChild();
-        } else {
-            return outlineItem.getNextSibling();
-        }
     }
 
 }
