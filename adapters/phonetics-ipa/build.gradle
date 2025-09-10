@@ -1,0 +1,10 @@
+dependencies {
+    implementation project(':application')
+    implementation platform('software.amazon.awssdk:bom:2.20.56')
+    implementation("software.amazon.awssdk:lambda")
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    testImplementation project(":test-data")
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "com.github.tomakehurst:wiremock-standalone:3.0.1"
+}
