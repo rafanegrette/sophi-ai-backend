@@ -1,15 +1,15 @@
 package com.rafanegrette.books.services;
 
-import java.io.IOException;
 import java.util.UUID;
 
+import com.rafanegrette.books.port.out.BookRepository;
+import com.rafanegrette.books.port.out.PhoneticService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.rafanegrette.books.model.Book;
 import com.rafanegrette.books.port.out.SaveBookService;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -19,18 +19,25 @@ public class SaveBookCoordinatorService implements SaveBookService {
 
     private final SaveBookService saveBookDBService;
     private final SaveBookService saveBookAudioService;
-    private final SaveBookService saveBookWriteUserStateService;
+    private final SaveBookService saveBookUserStateService;
+    private final BookRepository saveBookPhoneticService;
+    private final PhoneticService phoneticService;
 
     public SaveBookCoordinatorService(@Qualifier("SaveBookDBService")
                                       SaveBookService saveBookDBService,
                                       @Qualifier("SaveBookAudioService")
                                       SaveBookService saveBookAudioService,
-                                      @Qualifier("SaveBookWriteUserStateService")
-                                      SaveBookService saveBookWriteUserStateService) {
+                                      @Qualifier("SaveBookUserStateService")
+                                      SaveBookService saveBookUserStateService,
+                                      @Qualifier("BookPhoneticDynamoService")
+                                      BookRepository saveBookPhoneticService,
+                                      @Qualifier("PhoneticIpaService")
+                                      PhoneticService phoneticService) {
         this.saveBookAudioService = saveBookAudioService;
         this.saveBookDBService = saveBookDBService;
-        this.saveBookWriteUserStateService = saveBookWriteUserStateService;
-
+        this.saveBookUserStateService = saveBookUserStateService;
+        this.saveBookPhoneticService = saveBookPhoneticService;
+        this.phoneticService = phoneticService;
     }
 
     @Override
@@ -45,7 +52,9 @@ public class SaveBookCoordinatorService implements SaveBookService {
 
         saveBookDBService.save(bookWithId);
         saveBookAudioService.save(bookWithId);
-        saveBookWriteUserStateService.save(bookWithId);
+        saveBookUserStateService.save(bookWithId);
+
+        saveBookPhoneticService.save(phoneticService.getPhoneticBook(bookWithId));
         log.info("Saved book id: {}", bookWithId.id());
     }
 

@@ -1,6 +1,7 @@
 package com.rafanegrette.books.services;
 
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.rafanegrette.books.model.Book;
@@ -15,7 +16,7 @@ public class SaveBookDBService implements SaveBookService {
 
     private final BookRepository bookRepository;
 
-    public SaveBookDBService(BookRepository bookRepository) {
+    public SaveBookDBService(@Qualifier("BookDynamoService") BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
 

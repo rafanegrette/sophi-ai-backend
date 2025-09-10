@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import com.rafanegrette.books.port.out.DeleteAudioService;
 
-import lombok.RequiredArgsConstructor;
 
 @Service("DeleteBookCoordinatorService")
 public class DeleteBookCoordinatorService implements DeleteBookService {

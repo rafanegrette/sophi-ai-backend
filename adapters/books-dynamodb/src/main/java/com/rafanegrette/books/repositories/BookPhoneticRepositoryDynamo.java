@@ -1,30 +1,27 @@
 package com.rafanegrette.books.repositories;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Qualifier;
-import software.amazon.awssdk.enhanced.dynamodb.Key;
-import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
-
-import org.springframework.stereotype.Component;
-
 import com.rafanegrette.books.model.Book;
 import com.rafanegrette.books.model.Title;
 import com.rafanegrette.books.port.out.BookRepository;
 import com.rafanegrette.books.repositories.entities.TitleImpl;
 import com.rafanegrette.books.repositories.mappers.BookMapper;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
+import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
-@Component("BookDynamoService")
-public class BookRepositoryDynamo implements BookRepository {
+@Component("BookPhoneticDynamoService")
+public class BookPhoneticRepositoryDynamo implements BookRepository {
 
     private final DBBookTable bookTable;
 
-    public BookRepositoryDynamo(@Qualifier("DynamoDBBookTable") DBBookTable bookTable) {
+    public BookPhoneticRepositoryDynamo(@Qualifier("DynamoDBPhoneticTable") DBBookTable bookTable) {
         this.bookTable = bookTable;
     }
 
@@ -57,11 +54,9 @@ public class BookRepositoryDynamo implements BookRepository {
     }
 
     public void deleteAll() {
-        
     }
 
     public List<Book> findAll() {
         return new ArrayList<>();
     }
-
 }

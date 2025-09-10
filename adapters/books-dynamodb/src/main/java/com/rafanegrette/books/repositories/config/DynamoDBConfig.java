@@ -3,12 +3,14 @@ package com.rafanegrette.books.repositories.config;
 import com.rafanegrette.books.repositories.entities.UserBookReadStateDyna;
 import com.rafanegrette.books.repositories.entities.UserBookWriteStateDyna;
 import com.rafanegrette.books.repositories.entities.UserDyna;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.rafanegrette.books.repositories.entities.BookDyna;
 
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
@@ -21,9 +23,18 @@ public class DynamoDBConfig {
 	private final DynamoDbEnhancedClient dynamoDbEnhancedClient;
 	
 	@Bean
+	@Qualifier("DynamoBook")
+	@Primary
 	public DynamoDbTable<BookDyna> configDynamoDBTable() {
 		TableSchema<BookDyna> booksSchema = BeanTableSchema.create(BookDyna.class);
 		return dynamoDbEnhancedClient.table("Book", booksSchema);
+	}
+
+	@Bean
+	@Qualifier("DynamoBookPhonetic")
+	public DynamoDbTable<BookDyna> configDynamoBookPhoneticDBTable() {
+		TableSchema<BookDyna> booksSchema = BeanTableSchema.create(BookDyna.class);
+		return dynamoDbEnhancedClient.table("BookPhonetic", booksSchema);
 	}
 
 	@Bean

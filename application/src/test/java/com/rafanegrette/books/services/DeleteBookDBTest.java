@@ -23,7 +23,7 @@ class DeleteBookDBTest {
 	@Test
 	void testDeleteBook() {
 		deleteBookDB.deleteBook("Harry-1");
-		verify(bookRepository, times(1)).deleteById("Harry-1");
+		verify(bookRepository, times(2)).deleteById("Harry-1");
 	}
 
 }

@@ -2,4 +2,7 @@ dependencies {
     implementation project(":application")
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation group: 'org.apache.opennlp', name: 'opennlp-tools', version: '2.3.2'
+    implementation 'edu.stanford.nlp:stanford-corenlp:4.5.4'
+    implementation 'edu.stanford.nlp:stanford-corenlp:4.5.4:models'
+
 }

@@ -1,6 +1,7 @@
 package com.rafanegrette.books.controllers;
 
 
+import com.rafanegrette.books.model.PhoneticBook;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -61,23 +62,23 @@ class BookControllerTest {
     @Test
     void testGetBook() throws Exception {
         //GIVEN
-        Optional<Book> harryBook = Optional.of(new Book("UID-32432K", "Harry Potter and the Sorcerer's Stone", "Harry-1", null, null));
+        Optional<PhoneticBook> harryBook = Optional.of(new PhoneticBook("UID-32432K", "Harry Potter and the Sorcerer's Stone", "Harry-1", null, null));
         //WHEN
-        when(readBookService.getBook("Harry-1")).thenReturn(harryBook);
+        when(readBookService.getPhoneticBook("Harry-1")).thenReturn(harryBook);
         MvcResult mvcResult = this.mockMvc.perform(get("/books/{bookId}", "Harry-1"))
                 .andExpect(status().isOk())
                 .andReturn();
         String jsonResponse = mvcResult.getResponse().getContentAsString();
-        Book book = new ObjectMapper().readValue(jsonResponse, Book.class);
+        PhoneticBook book = new ObjectMapper().readValue(jsonResponse, PhoneticBook.class);
         assertEquals("Harry Potter and the Sorcerer's Stone", book.title());
     }
     
     @Test
     void testGetBookNotFound() throws Exception {
         //GIVEN
-        Optional<Book> emptyBook = Optional.of(Book.EMPTY_BOOK);
+        Optional<PhoneticBook> emptyBook = Optional.of(PhoneticBook.EMPTY_BOOK);
         //WHEN
-        when(readBookService.getBook("Harry-1")).thenReturn(emptyBook);
+        when(readBookService.getPhoneticBook("Harry-1")).thenReturn(emptyBook);
         MvcResult mvcResult = this.mockMvc.perform(get("/books/{bookId}", "Harry-1")).andExpect(status().isOk()).andReturn();
         String jsonResponse = mvcResult.getResponse().getContentAsString();
         Book book = new ObjectMapper().readValue(jsonResponse, Book.class);

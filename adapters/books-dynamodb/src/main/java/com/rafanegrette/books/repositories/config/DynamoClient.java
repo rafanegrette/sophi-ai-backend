@@ -1,7 +1,5 @@
 package com.rafanegrette.books.repositories.config;
 
-import java.net.URI;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +46,7 @@ public class DynamoClient {
         createBookTable(dynamoDbClient);
 		createUserTable(dynamoDbClient);
 		createUserBookWriteStateTable(dynamoDbClient);
+		createBookPhoneticTable(dynamoDbClient);
         return dynamoDbClient;
 	}
 
@@ -58,6 +57,10 @@ public class DynamoClient {
 
 	private void createBookTable(DynamoDbClient dynamoDbClient) {
 		createTable(dynamoDbClient, "Book", "id");
+	}
+
+	private void createBookPhoneticTable(DynamoDbClient dynamoDbClient) {
+		createTable(dynamoDbClient, "BookPhonetic", "id");
 	}
 
 	private void createUserBookWriteStateTable(DynamoDbClient dynamoDbClient) {

@@ -1,27 +1,42 @@
 package com.rafanegrette.books.npl.config;
 
-import opennlp.tools.sentdetect.SentenceDetectorME;
-import opennlp.tools.sentdetect.SentenceModel;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.nio.file.Path;
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.pipeline.CoreDocument;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.util.CoreMap;
+import java.util.List;
+import java.util.Properties;
 
 @Component
 @Lazy
 public class ModelSegmentSentence {
 
-    private final SentenceDetectorME sentenceDetectorME;
+    private final StanfordCoreNLP pipeline;
 
-    ModelSegmentSentence(@Value("${app.model.nlp.path}") String pathNlpSegmentModel) throws IOException {
-        var file = Path.of(pathNlpSegmentModel);
-        var model = new SentenceModel(file);
-        this.sentenceDetectorME =  new SentenceDetectorME(model);
+    ModelSegmentSentence() {
+
+        Properties props = new Properties();
+        props.setProperty("annotators", "tokenize,ssplit");
+        props.setProperty("ssplit.isOneSentence", "false");
+
+        // Optional: suppress some logging
+        props.setProperty("tokenize.verbose", "false");
+        props.setProperty("ssplit.verbose", "false");
+
+        this.pipeline = new StanfordCoreNLP(props);
+
     }
     public String[] detectSentence(String text) {
-        return sentenceDetectorME.sentDetect(text);
+        CoreDocument document = new CoreDocument(text);
+        pipeline.annotate(document);
+
+        List<CoreMap> sentences = document.annotation().get(CoreAnnotations.SentencesAnnotation.class);
+
+        return sentences.stream()
+                .map(sentence -> sentence.get(CoreAnnotations.TextAnnotation.class).trim())
+                .toArray(String[]::new);
+
     }
 }

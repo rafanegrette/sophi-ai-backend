@@ -6,10 +6,13 @@ import java.util.Optional;
 import com.rafanegrette.books.controllers.PageDTO;
 import com.rafanegrette.books.model.Book;
 import com.rafanegrette.books.model.Chapter;
+import com.rafanegrette.books.model.PhoneticBook;
 import com.rafanegrette.books.model.Title;
 
 
 public interface ReadBookService {
+
+    Optional<PhoneticBook> getPhoneticBook(String name);
 
     Optional<Book> getBook(String name);
     

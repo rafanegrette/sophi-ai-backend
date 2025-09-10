@@ -8,7 +8,7 @@ import com.rafanegrette.books.model.ContentIndex;
 
 public class BookMother {
     
-    private static BookBuilder harryPotter1 = new BookBuilder();
+    private static final BookBuilder harryPotter1 = new BookBuilder();
     
     public static BookBuilder harryPotter1() {
         return harryPotter1
@@ -18,7 +18,17 @@ public class BookMother {
                 .chapters(List.of(ChapterMother.potterChapter1().build(),
                         ChapterMother.potterChapter2().build()));
     }
-    
+
+    public static BookBuilder harryPotter1Phonetic() {
+        return harryPotter1
+                .id("Harry-1")
+                .label("We can assume that is the original book with the content changed, " +
+                        "we will not testing if the content changed, but the concept of it as it was.")
+                .title("Harry Potter and the Sorcerer's Stone")
+                .chapters(List.of(ChapterMother.potterChapterPhonetic1().build(),
+                        ChapterMother.potterChapter2().build()));
+    }
+
     public static BookBuilder harryPotter2() {
         return harryPotter1
                 .id("Harry-2")

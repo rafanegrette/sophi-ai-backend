@@ -5,7 +5,6 @@ import com.rafanegrette.books.port.out.DeleteBookStateService;
 import com.rafanegrette.books.port.out.ReadBookUserStateRepository;
 import com.rafanegrette.books.repositories.entities.BookStateDyna;
 import com.rafanegrette.books.repositories.entities.UserBookReadStateDyna;
-import com.rafanegrette.books.repositories.entities.UserBookWriteStateDyna;
 import com.rafanegrette.books.repositories.mappers.BookStateMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

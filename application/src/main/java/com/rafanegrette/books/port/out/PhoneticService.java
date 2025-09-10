@@ -2,7 +2,6 @@ package com.rafanegrette.books.port.out;
 
 import com.rafanegrette.books.model.Book;
 
-public interface SaveBookService {
-
-	void save(Book book);
+public interface PhoneticService {
+    Book getPhoneticBook(Book book);
 }

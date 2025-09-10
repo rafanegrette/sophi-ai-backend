@@ -7,15 +7,20 @@ import com.rafanegrette.books.model.Sentence;
 
 public class ParagraphMother {
     
-    private static ParagraphBuilder paragraph1 = new ParagraphBuilder();
-    private static ParagraphBuilder paragraph2 = new ParagraphBuilder();
-    private static ParagraphBuilder paragraph3 = new ParagraphBuilder();
-    private static ParagraphBuilder paragraph4 = new ParagraphBuilder();
+    private static final ParagraphBuilder paragraph1 = new ParagraphBuilder();
+    private static final ParagraphBuilder paragraphPhonetic1 = new ParagraphBuilder();
+    private static final ParagraphBuilder paragraph2 = new ParagraphBuilder();
+    private static final ParagraphBuilder paragraph3 = new ParagraphBuilder();
+    private static final ParagraphBuilder paragraph4 = new ParagraphBuilder();
     
     public static ParagraphBuilder paragraph1() {
         return paragraph1.id(1).sentences(List.of(new Sentence(0, "This is boring story")));
     }
-    
+
+    public static ParagraphBuilder paragraphPhonetic1() {
+        return paragraphPhonetic1.id(1).sentences(List.of(new Sentence(0, "ˈðɪs ˈɪz ˈbɔɹɪŋ ˈstɔɹi")));
+    }
+
     public static ParagraphBuilder paragraph2() {
         return paragraph2.id(2).sentences(List.of(new Sentence(0, "This is another boring story")));
     }

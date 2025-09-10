@@ -6,9 +6,10 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 
+import com.rafanegrette.books.model.PhoneticBook;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -24,13 +25,40 @@ import com.rafanegrette.books.port.out.BookRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ReadBookDBServiceTest {
-    
+
     @Mock
     BookRepository bookRepository;
+
+    @Mock
+    BookRepository phoneticBookRepository;
     
-    @InjectMocks
     ReadBookDBService readBookService;
-    
+
+    @BeforeEach
+    void setUp() {
+        readBookService = new ReadBookDBService(bookRepository, phoneticBookRepository);
+    }
+
+    @Test
+    void testGetPhoneticBook() {
+        //GIVEN
+        String bookName = "Harry-1";
+        Optional<Book> harry1Book = Optional.of(BookMother.harryPotter1().build());
+        Optional<Book> harry1Phonetic = Optional.of(BookMother.harryPotter1Phonetic().build());
+
+        //WHEN
+        when(phoneticBookRepository.findById(bookName)).thenReturn(harry1Phonetic);
+        when(bookRepository.findById(bookName)).thenReturn(harry1Book);
+
+        Optional<PhoneticBook> bookReturned = readBookService.getPhoneticBook(bookName);
+        //THEN
+        assertEquals(harry1Book.get().title(), bookReturned.get().title());
+        assertEquals(harry1Book.get().chapters().getFirst().pages().getFirst().paragraphs().getFirst().sentences().getFirst().text(),
+                bookReturned.get().chapters().getFirst().pages().getFirst().paragraphs().getFirst().sentences().getFirst().text());
+        assertEquals(harry1Phonetic.get().chapters().getFirst().pages().getFirst().paragraphs().getFirst().sentences().getFirst().text(),
+                bookReturned.get().chapters().getFirst().pages().getFirst().paragraphs().getFirst().sentences().getFirst().phonetic());
+    }
+
     @Test
     void testGetBook() {
         //GIVEN        

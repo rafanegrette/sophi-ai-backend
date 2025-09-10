@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
-@Service("SaveBookWriteUserStateService")
+@Service("SaveBookUserStateService")
 public class SaveBookUserStateService implements SaveBookService, BookUserStateService {
 
     private final ReadBookUserStateRepository readStateRepository;

@@ -3,11 +3,11 @@ package com.rafanegrette.books.controllers;
 import java.io.IOException;
 import java.util.List;
 
+import com.rafanegrette.books.model.PhoneticBook;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.rafanegrette.books.model.Book;
 import com.rafanegrette.books.model.Chapter;
 import com.rafanegrette.books.model.Title;
 import com.rafanegrette.books.services.ReadBookService;
@@ -22,8 +22,8 @@ public class BookController {
     private final ReadBookService readBookService;
 
     @GetMapping("/{bookId}")
-    public Book getBook(@PathVariable("bookId") String bookId) throws IOException {
-        return this.readBookService.getBook(bookId).get();
+    public PhoneticBook getBook(@PathVariable("bookId") String bookId) throws IOException {
+        return this.readBookService.getPhoneticBook(bookId).get();
     }
     
     @GetMapping("/{bookId}/chapters/{chapterId}")

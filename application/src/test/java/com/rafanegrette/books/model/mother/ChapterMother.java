@@ -7,9 +7,10 @@ import com.rafanegrette.books.model.Page;
 
 public class ChapterMother {
 
-    private static ChapterBuilder potterChapter1 = new ChapterBuilder();
-    private static ChapterBuilder potterChapter2 = new ChapterBuilder();
-    
+    private static final ChapterBuilder potterChapter1 = new ChapterBuilder();
+    private static final ChapterBuilder potterChapter2 = new ChapterBuilder();
+    private static final ChapterBuilder potterChapterPhonetic1 = new ChapterBuilder();
+
     public static ChapterBuilder potterChapter1() {
         return potterChapter1
         		.id(0)
@@ -18,7 +19,16 @@ public class ChapterMother {
                         PageMother.page2().build(),
                         PageMother.page3().build()));
     }
-    
+
+    public static ChapterBuilder potterChapterPhonetic1() {
+        return potterChapterPhonetic1
+                .id(0)
+                .title("The boy how lived")
+                .pages(List.of(PageMother.pagePhonetic1().build(),
+                        PageMother.page2().build(),
+                        PageMother.page3().build()));
+    }
+
     public static ChapterBuilder potterChapter2() {
         return potterChapter2
         		.id(1)
