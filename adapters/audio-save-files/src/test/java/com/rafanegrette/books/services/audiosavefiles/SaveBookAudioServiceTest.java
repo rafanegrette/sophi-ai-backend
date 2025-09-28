@@ -16,7 +16,7 @@ public class SaveBookAudioServiceTest {
     SpeechService speechService;
 
     @Mock
-    SaveAudioFileService saveAudioService;
+    SaveAudioFileS3Service saveAudioService;
 
     @InjectMocks
     SaveBookAudioService saveBookAudioService;

@@ -1,6 +1,7 @@
 package com.rafanegrette.books.services.audiosavefiles;
 
 
+import com.rafanegrette.books.port.out.SaveAudioFileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +13,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SaveAudioFileService {
+public class SaveAudioFileS3Service implements SaveAudioFileService {
 
 	@Value("${aws.bucketName}")
 	private String bucketName;

@@ -18,7 +18,7 @@ public class SaveBookAudioService implements SaveBookService {
     private final SpeechService speechService;
 
     @Autowired
-    private final SaveAudioFileService saveAudioService;
+    private final SaveAudioFileS3Service saveAudioService;
     
     @Override
     public void save(Book book) {

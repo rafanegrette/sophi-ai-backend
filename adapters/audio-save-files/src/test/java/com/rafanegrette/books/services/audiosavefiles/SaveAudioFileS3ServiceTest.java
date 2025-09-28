@@ -17,13 +17,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class SaveAudioFileServiceTest {
+class SaveAudioFileS3ServiceTest {
 
 	@Mock
 	S3AsyncClient s3AsyncClient;
 	
 	@InjectMocks
-	SaveAudioFileService saveAudioFileService;
+	SaveAudioFileS3Service saveAudioFileS3Service;
 	
 	@Test
 	void testSave() {
@@ -36,7 +36,7 @@ class SaveAudioFileServiceTest {
 		
 		when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class))).thenReturn(objectResponse);
 		// when
-		saveAudioFileService.save(filePath, file);
+		saveAudioFileS3Service.save(filePath, file);
 		
 		// then
 		verify(s3AsyncClient, times(1)).putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));

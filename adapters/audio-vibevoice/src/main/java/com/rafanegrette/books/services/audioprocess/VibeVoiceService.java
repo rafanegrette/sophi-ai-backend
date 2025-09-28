@@ -17,9 +17,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 public class VibeVoiceService implements SpeechService, TextToSpeechService {
 
-    private WebClient webClient;
+    private final WebClient webClient;
     private final String SPEAKER_PREFIX = "Speaker 1: ";
-    private final double CFG = 1.8;
+    private final double CFG = 1.7;
 
     public VibeVoiceService(@Qualifier("WebClientVibeVoice") WebClient webClient) {
         this.webClient = webClient;
@@ -27,7 +27,7 @@ public class VibeVoiceService implements SpeechService, TextToSpeechService {
 
     @Override
     public byte[] speech(String text) {
-        var speechMessage = new SpeechMessage(SPEAKER_PREFIX + text, new Voice[] {Voice.EN_CARTER_MAN}, CFG);
+        var speechMessage = new SpeechMessage(SPEAKER_PREFIX + text.replaceAll("\"", ""), new Voice[] {Voice.EN_CARTER_MAN}, CFG);
         var objectMapper = new ObjectMapper();
 
         try {

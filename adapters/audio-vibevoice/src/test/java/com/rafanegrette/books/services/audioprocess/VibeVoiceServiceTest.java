@@ -51,7 +51,7 @@ public class VibeVoiceServiceTest {
     void speech_ShouldReturnAudioBytes_WhenValidTextProvided() throws JsonProcessingException {
         // given
         var inputText = "Speaker 1: "  + INPUT_TEXT;
-        var inputModel = new SpeechMessage(inputText, new Voice[] {Voice.EN_FRANK_MAN}, 1.8);
+        var inputModel = new SpeechMessage(inputText, new Voice[] {Voice.EN_CARTER_MAN}, 1.7);
         var inputModelStr = objectMapper.writeValueAsString(inputModel);
         byte[] expectedAudioData = "audio-in-bytes".getBytes();
 
